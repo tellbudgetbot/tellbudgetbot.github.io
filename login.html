@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en">
+<head>
+<link rel="stylesheet" type="text/css" href="css/login.css" />
+    <title>Budget Bot</title>
+</head>
+<body>
+
+<!-- source: https://codepen.io/colorlib/pen/rxddKy -->
+<div class="login-page">
+  <div class="form">
+    <form class="register-form" onsubmit="signup(); return false;">
+      <input type="text" placeholder="name" id="user1"/>
+      <input type="password" placeholder="password" id="password1"/>
+      <button>create</button>
+      <p class="message">Already registered? <a href="#">Sign In</a></p>
+    </form>
+    <form class="login-form" onsubmit="login(); return false;">
+      <input type="text" placeholder="username" id="user2"/>
+      <input type="password" placeholder="password" id="password2"/>
+      <button>login</button>
+      <p class="message">Not registered? <a href="#">Create an account</a></p>
+    </form>
+  </div>
+</div>
+<script
+        src="//code.jquery.com/jquery-3.3.1.min.js"
+        integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
+        crossorigin="anonymous"></script>
+<script>
+var host = "https://budget-bot.tk";
+$('.message a').click(function(){
+   $('form').animate({height: "toggle", opacity: "toggle"}, "slow");
+});
+function login(){
+  var user = document.getElementById("user2").value;
+  var pass = document.getElementById("password2").value;
+  $.get(host+"/userid?user="+user+"&pass="+pass, function( data ) {
+    if(data!=="null") {
+      redir(user,pass,data);
+    } else {
+      alert("Wrong password, sorry.");
+    }
+  }).fail(function() {
+    console.log('Error');
+  });
+}
+function signup(){
+  var user = document.getElementById("user1").value;
+  var pass = document.getElementById("password1").value;
+  $.get(host+"/signup?user="+user+"&pass="+pass, function( data ) {
+    if(data!=="null") {
+      redir(user,pass,data);
+    } else {
+      alert("Username is taken, sorry.")
+    }
+  }).fail(function() {
+    console.log('Error');
+  });
+}
+function redir(user,pass){
+  /*if(window.location.search.indexOf("alexa")!==-1){
+		var url = window.location.href;
+		var state = getParameterByName("state", url);
+		var state = getParameterByName(state, url);
+  }
+  else {*/
+      localStorage.setItem("user",user);
+      localStorage.setItem("pass",pass);
+      document.location.href="index.html";
+  //}
+}
+function getParameterByName(name, url) {
+    if (!url) url = window.location.href;
+    name = name.replace(/[\[\]]/g, "\\$&");
+    var regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)"),
+        results = regex.exec(url);
+    if (!results) return null;
+    if (!results[2]) return '';
+    return decodeURIComponent(results[2].replace(/\+/g, " "));
+}
+</script>
+</body>
+</html>

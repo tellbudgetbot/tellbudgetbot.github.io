@@ -1,0 +1,14 @@
+a.anchor {
+  padding-top:50px;
+}
+p {
+  color: #555;
+}
+a[href]:visited, a[href] {
+  color: #00A;
+}
+.caption {
+  padding-top:0px;
+  margin-top:0px;
+  margin-bottom:30px;
+}
