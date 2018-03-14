@@ -1,10 +1,10 @@
 var user=null;
-var pass=null;
+var token=null;
 var categoryPieChart = null;
 var host = "https://budget-bot.tk";
 
 function auth(){
-  return "user="+user+"&pass="+pass;
+  return {"token": token};
 }
 
 function isNum(num){
@@ -16,8 +16,54 @@ var state = {
   "expenseinner": null
 };
 
+function update_balance(elem, key) {
+  var balance = prompt("Enter new balance");
+  if(isNum(balance)) {
+    var data = auth();
+    auth["account"] = key;
+    auth["balance"]=Number(balance);
+    $.ajax({
+        type: "POST",
+        url: host+"/set_balance",
+        data: data,
+        dataType: "json",
+        success: function(data) {
+          console.log(data);
+          if(data) {
+            render_balances();
+          }
+        }
+    });
+  } else {
+    alert("Not a number");
+  }
+
+}
+function add_account(){
+  var name = prompt("Enter account name");
+  if(name.length >= 1) {
+    var data = auth();
+    auth["account"] = name;
+    auth["balance"] = 0;
+    $.ajax({
+        type: "POST",
+        url: host+"/set_balance",
+        data: data,
+        dataType: "json",
+        success: function(data) {
+          console.log(data);
+          if(data) {
+            render_balances();
+          }
+        }
+    });
+  } else {
+    alert("Not a valid name");
+  }
+}
+
 function render_balances() {
-  $.getJSON(host+"/get_balances?"+auth(), function(data) {
+  function render_balance_response(data) {
     var text = '<table class="pure-table">';
     text += '<thead><tr><th>Account</th><th>Balance</th><th></th></tr></thead><tbody>';
     for(var i = 0; i < data.length; i++) {
@@ -29,32 +75,10 @@ function render_balances() {
     for(let i = 0; i < data.length; i++) {
       let elem = document.getElementById("acct_update"+i);
       elem.onclick = function() {
-        var balance = prompt("Enter new balance");
-        if(isNum(balance)) {
-          $.getJSON(host+"/set_balance?account="+encodeURIComponent(data[i][0])+"&balance="+Number(balance)+"&"+auth(), function(data) {
-            console.log(data);
-            if(data) {
-              render_balances();
-            }
-          });
-        } else {
-          alert("Not a number");
-        }
+        update_balance(elem, data[i][0]);
       };
     }
-    document.getElementById("acct_add").onclick = function() {
-        var name = prompt("Enter account name");
-        if(name.length >= 1) {
-          $.getJSON(host+"/set_balance?account="+encodeURIComponent(name)+"&balance=0&"+auth(), function(data) {
-            console.log(data);
-            if(data) {
-              render_balances();
-            }
-          });
-        } else {
-          alert("Not a valid name");
-        }
-    };
+    document.getElementById("acct_add").onclick = add_account;
     var options = "";
     var suggest = "";
     for(var i = 0; i < data.length; i++) {
@@ -69,6 +93,13 @@ function render_balances() {
       accountsel.innerHTML=options;
       state.accountselinner=options;
     }
+  };
+  $.ajax({
+      type: "POST",
+      url: host+"/get_balances",
+      data: auth(),
+      dataType: "json",
+      success: render_balance_response
   });
 }
 
@@ -92,9 +123,37 @@ function render_add_expense() {
     source: cats
   });
 }
+function update_expense(elem, key) {
+  var desc = prompt("Enter new description");
+  var cat = prompt("Enter new category");
+  var acct = prompt("Enter new account");
+  var amt = prompt("Enter new amount");
+  if(isNum(amt) && desc.length > 0 && cat.length > 0 && acct.length > 0) {
+    var data = auth();
+    data["key"] = key;
+    data["description"] = desc;
+    data["category"] = cat;
+    data["account"] = acct;
+    data["amount"] = Number(amt);
+    $.ajax({
+        type: "POST",
+        url: host+"/add",
+        data: data,
+        dataType: "json",
+        success: function(data) {
+          console.log(data);
+          if(data) {
+            render();
+          }
+        }
+    });
+  } else {
+    alert("Not valid");
+  }
+}
 
 function render_expenses() {
-  $.getJSON(host+"/view_30days?"+auth(), function(data) {
+  function render_expenses_response(data) {
     var text = '<table class="pure-table">';
     text += '<thead><tr><th>Time</th><th>Expense</th><th>Category</th><th>Account</th><th>Amount</th><th></th></tr></thead><tbody>';
     for(var i = 0; i < data.length; i++) {
@@ -116,20 +175,7 @@ function render_expenses() {
     for(let i = 0; i < data.length; i++) {
       let elem = document.getElementById("expense_update"+i);
       elem.onclick = function() {
-        var desc = prompt("Enter new description");
-        var cat = prompt("Enter new category");
-        var acct = prompt("Enter new account");
-        var amt = prompt("Enter new amount");
-        if(isNum(amt) && desc.length > 0 && cat.length > 0 && acct.length > 0) {
-          $.getJSON(host+"/add?key="+data[i][0]+"&description="+encodeURIComponent(desc)+"&category="+encodeURIComponent(cat)+"&account="+encodeURIComponent(acct)+"&amount="+Number(amt)+"&"+auth(), function(data) {
-            console.log(data);
-            if(data) {
-              render();
-            }
-          });
-        } else {
-          alert("Not valid");
-        }
+        update_expense(elem, data[i][0]);
       }
     }
     if(update) {
@@ -164,6 +210,13 @@ function render_expenses() {
       }
       categoryPieChart.update();
     }
+  }
+  $.ajax({
+      type: "POST",
+      url: host+"/view_30days",
+      data: auth(),
+      dataType: "json",
+      success: render_expenses_response
   });
 }
 function get_cat(cat_sums, cat){
@@ -171,23 +224,31 @@ function get_cat(cat_sums, cat){
 }
 
 function submit_expense() {
+  var data = auth();
   var desc = document.getElementById("description").value;
-  var params = "?description="+ encodeURIComponent(desc);
+  data["description"]=desc;
   var amt = document.getElementById("amount").value;
   if(isNum(amt)) {
-    params += "&amount="+Number(amt);
+    data["amount"] = amt;
   }
-  params += "&category="+encodeURIComponent(document.getElementById("category").value);
-  params += "&account="+encodeURIComponent(document.getElementById("account-sel").value);
+  data["category"]=document.getElementById("category").value;
+  data["account"]=document.getElementById("account-sel").value;
   if(desc.length > 0 || amt.length > 0) {
-    $.getJSON(host+"/add"+params+"&"+auth(), function(data) {
+    function submit_expense_response(data) {
       console.log(data);
       if(data) {
-        render_balances();
+        render();
       }
       document.getElementById("description").value="";
       document.getElementById("amount").value="";
       document.getElementById("category").value="";
+    };
+    $.ajax({
+        type: "POST",
+        url: host+"/add",
+        data: data,
+        dataType: "json",
+        success: submit_expense_response
     });
   }
 }
@@ -200,7 +261,7 @@ function render() {
 
 function init() {
   user = localStorage.getItem("user");
-  pass = localStorage.getItem("pass");
+  token = localStorage.getItem("token");
   if(user === null) {
     document.location.href = "login.html";
   } else {
@@ -211,9 +272,9 @@ function init() {
 }
 
 function setup() {
-  $.getJSON(host+"/userid?"+auth(), function(data) {
+  /*TODO $.getJSON(host+"/userid?"+auth(), function(data) {
     document.getElementById("security").innerText = data;
-  });
+  });*/
 
   var ctx = document.getElementById("pieChart").getContext('2d');
   categoryPieChart = new Chart(ctx, {
