@@ -64,7 +64,15 @@ function signup(){
   });
 }
 function is_valid_redirect(redirect_uri) {
-  return redirect_uri === "https://pitangui.amazon.com/api/skill/link/M1MY1UQEEEFTLT" || redirect_uri === "https://layla.amazon.com/api/skill/link/M1MY1UQEEEFTLT" || redirect_uri === "https://alexa.amazon.co.jp/api/skill/link/M1MY1UQEEEFTLT";
+  var uris = ["https://pitangui.amazon.com/spa/skill/account-linking-status.html?vendorId=M1MY1UQEEEFTLT",
+              "https://layla.amazon.com/spa/skill/account-linking-status.html?vendorId=M1MY1UQEEEFTLT",
+              "https://alexa.amazon.co.jp/spa/skill/account-linking-status.html?vendorId=M1MY1UQEEEFTLT"];
+  for(var i = 0;  i < uris.length; i++) {
+    if(redirect_uri == uris[i]){
+      return true;
+    }
+  }
+  return false;
 }
 function redir(user,data){
   if(window.location.search.indexOf("alexa")!==-1){
