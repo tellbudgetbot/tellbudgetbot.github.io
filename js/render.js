@@ -20,8 +20,8 @@ function update_balance(elem, key) {
   var balance = prompt("Enter new balance");
   if(isNum(balance)) {
     var data = auth();
-    auth["account"] = key;
-    auth["balance"]=Number(balance);
+    data["account"] = key;
+    data["balance"]=Number(balance);
     $.ajax({
         type: "POST",
         url: host+"/set_balance",
@@ -43,8 +43,8 @@ function add_account(){
   var name = prompt("Enter account name");
   if(name.length >= 1) {
     var data = auth();
-    auth["account"] = name;
-    auth["balance"] = 0;
+    data["account"] = name;
+    data["balance"] = 0;
     $.ajax({
         type: "POST",
         url: host+"/set_balance",

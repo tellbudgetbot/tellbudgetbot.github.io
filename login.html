@@ -13,7 +13,7 @@
 <div class="login-page">
   <div class="form">
     <form class="register-form" onsubmit="signup(); return false;">
-      <input type="text" placeholder="name" id="user1"/>
+      <input type="text" placeholder="username" id="user1"/>
       <input type="text" placeholder="email" id="email1"/>
       <input type="password" placeholder="password" id="password1"/>
       <button>create</button>
@@ -63,18 +63,26 @@ function signup(){
     console.log('Error');
   });
 }
+function is_valid_redirect(redirect_uri) {
+  return redirect_uri === "https://pitangui.amazon.com/api/skill/link/M1MY1UQEEEFTLT" || redirect_uri === "https://layla.amazon.com/api/skill/link/M1MY1UQEEEFTLT" || redirect_uri === "https://alexa.amazon.co.jp/api/skill/link/M1MY1UQEEEFTLT";
+}
 function redir(user,data){
-  /*if(window.location.search.indexOf("alexa")!==-1){
+  if(window.location.search.indexOf("alexa")!==-1){
 		var url = window.location.href;
 		var state = getParameterByName("state", url);
-		var state = getParameterByName(state, url);
+		var client_id = getParameterByName("client_id", url);
+		var response_type = getParameterByName("response_type", url);
+		var scope = getParameterByName("scope", url);
+		var redirect_uri = getParameterByName("redirect_uri", url);
+    if(client_id == "alexa" && is_valid_redirect(redirect_uri)) {
+      document.location.href=redirect_uri+"?state="+state+"&access_token="+data["token"]+"&token_type=Bearer";
+      return;
+    }
   }
-  else {*/
-      localStorage.setItem("user",user);
-      localStorage.setItem("userid",data.userid);
-      localStorage.setItem("token",data.token);
-      document.location.href="index.html";
-  //}
+  localStorage.setItem("user",user);
+  localStorage.setItem("userid",data.userid);
+  localStorage.setItem("token",data.token);
+  document.location.href="index.html";
 }
 function getParameterByName(name, url) {
     if (!url) url = window.location.href;
