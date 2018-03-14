@@ -83,7 +83,7 @@ function redir(user,data){
 		var scope = getParameterByName("scope", url);
 		var redirect_uri = getParameterByName("redirect_uri", url);
     if(client_id == "alexa" && is_valid_redirect(redirect_uri)) {
-      document.location.href=redirect_uri+"?state="+state+"&access_token="+data["token"]+"&token_type=Bearer";
+      document.location.href=redirect_uri+"&state="+state+"&access_token="+data["token"]+"&token_type=Bearer";
       return;
     }
   }
