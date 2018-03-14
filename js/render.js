@@ -105,7 +105,7 @@ function render_balances() {
 
 function render_add_expense() {
   var cats = ["Groceries",
-              "Eating out",
+              "Dining",
               "Electronics",
               "Entertainment",
               "Health",
@@ -231,8 +231,14 @@ function submit_expense() {
   if(isNum(amt)) {
     data["amount"] = amt;
   }
-  data["category"]=document.getElementById("category").value;
-  data["account"]=document.getElementById("account-sel").value;
+  var cat = document.getElementById("category").value;
+  if(cat.length > 0) {
+    data["category"]=cat;
+  }
+  var acct = document.getElementById("account-sel").value;
+  if(acct && acct.length > 0) {
+    data["account"]=document.getElementById("account-sel").value;
+  }
   if(desc.length > 0 || amt.length > 0) {
     function submit_expense_response(data) {
       console.log(data);
