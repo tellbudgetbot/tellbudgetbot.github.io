@@ -260,15 +260,9 @@ function render() {
 }
 
 function init() {
-  user = localStorage.getItem("user");
-  token = localStorage.getItem("token");
-  if(user === null) {
-    document.location.href = "login.html";
-  } else {
-    setup();
-    render();
-    setInterval(render, 20000);
-  }
+  setup();
+  render();
+  setInterval(render, 20000);
 }
 
 function setup() {
@@ -316,4 +310,13 @@ function setup() {
   categoryPieChart.render();
 }
 
-window.onload = init;
+function preinit() {
+  user = localStorage.getItem("user");
+  token = localStorage.getItem("token");
+  if(user === null) {
+    document.location.href = "login.html";
+  } else {
+    window.onload = init;
+  }
+}
+preinit();
