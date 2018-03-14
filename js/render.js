@@ -266,9 +266,19 @@ function init() {
 }
 
 function setup() {
-  /*TODO $.getJSON(host+"/userid?"+auth(), function(data) {
-    document.getElementById("security").innerText = data;
-  });*/
+  $.ajax({
+      type: "POST",
+      url: host+"/userid",
+      data: auth(),
+      dataType: "json",
+      success: function(data) {
+        if(data.error!==undefined) {
+          console.log(data.error);
+          logout();
+        }
+      }
+  });
+  document.getElementById("logoutBtn").onclick = logout;
 
   var ctx = document.getElementById("pieChart").getContext('2d');
   categoryPieChart = new Chart(ctx, {
@@ -308,6 +318,11 @@ function setup() {
     }
   });
   categoryPieChart.render();
+}
+
+function logout() {
+  localStorage.clear();
+  document.location.href="login.html";
 }
 
 function preinit() {

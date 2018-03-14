@@ -14,6 +14,7 @@
   <div class="form">
     <form class="register-form" onsubmit="signup(); return false;">
       <input type="text" placeholder="name" id="user1"/>
+      <input type="text" placeholder="email" id="email1"/>
       <input type="password" placeholder="password" id="password1"/>
       <button>create</button>
       <p class="message">Already registered? <a href="#">Sign In</a></p>
@@ -39,10 +40,10 @@ function login(){
   var user = document.getElementById("user2").value;
   var pass = document.getElementById("password2").value;
   $.post(host+"/login", {"user":user,"pass":pass}, function( data ) {
-    if(data!=="null") {
+    if(data.error === undefined ) {
       redir(user,data);
     } else {
-      alert("Wrong password, sorry.");
+      alert(data.error);
     }
   },"json").fail(function() {
     console.log('Error');
@@ -50,12 +51,13 @@ function login(){
 }
 function signup(){
   var user = document.getElementById("user1").value;
+  var email = document.getElementById("email1").value;
   var pass = document.getElementById("password1").value;
-  $.post(host+"/signup", {"user":user,"pass":pass}, function( data ) {
-    if(data!=="null") {
+  $.post(host+"/signup", {"user":user,"email":email,"pass":pass}, function( data ) {
+    if(data.error === undefined) {
       redir(user,data);
     } else {
-      alert("Username is taken, sorry.")
+      alert(data.error)
     }
   },"json").fail(function() {
     console.log('Error');
