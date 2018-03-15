@@ -320,7 +320,8 @@ function setup() {
         }]
     },
     options: {
-      responsive: false
+      responsive: true,
+      maintainAspectRatio: false,
     }
   });
   categoryPieChart.render();
