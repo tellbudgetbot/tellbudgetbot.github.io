@@ -98,7 +98,7 @@ function redir(user,data){
 		var client_id = getParameterByName("client_id", url);
 		var redirect_uri = getParameterByName("redirect_uri", url);
     if(client_id == "messenger" && is_valid_redirect(redirect_uri)) {
-      document.location.href=redirect_uri + "&account_linking_token="+link_token+"&authorization_code="+data.token;
+      document.location.href=redirect_uri + "&authorization_code="+data.token;
       return;
     }
   }
