@@ -50,7 +50,7 @@ a[href]:visited, a[href] {
   text-align:right;
 }
 .expense-amt-inner {
-  padding-right:1em;
+  padding-right:0.3em;
 }
 .expense-btns {
   text-align:right;
@@ -58,12 +58,18 @@ a[href]:visited, a[href] {
 .expense-btns-inner {
 }
 .edit-btn {
-  margin-right:0.5em;
+  margin-right:0.3em;
 }
 .del-btn {
-  margin-right:1em;
+  margin-right:0.3em;
 }
 
 .expense-clump {
   margin-bottom: 1.5em;
+}
+
+@media screen and (min-width: 64em) {
+  .expense-amt-inner {
+    padding-right: 2em;
+  }
 }
