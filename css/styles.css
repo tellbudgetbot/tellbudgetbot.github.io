@@ -12,3 +12,26 @@ a[href]:visited, a[href] {
   margin-top:0px;
   margin-bottom:30px;
 }
+
+.pure-table {
+  font-size: 0.8em;
+}
+.pure-table td, .pure-table th {
+  padding: 0.1em 0.2em;
+  line-height: 1em;
+}
+
+/*
+.edit-expense {
+  float:right;
+  margin-left:3px;
+  margin-right:3px;
+}*/
+
+.content {
+  padding: 0 0.5em;
+}
+
+.right-align {
+  text-align:right;
+}

@@ -128,7 +128,7 @@ function update_expense(elem, key) {
   var cat = prompt("Enter new category");
   var acct = prompt("Enter new account");
   var amt = prompt("Enter new amount");
-  if(isNum(amt) && desc.length > 0 && cat.length > 0 && acct.length > 0) {
+  if(amt!==null && isNum(amt) && desc && cat && acct && desc.length > 0 && cat.length > 0 && acct.length > 0) {
     var data = auth();
     data["key"] = key;
     data["description"] = desc;
@@ -152,18 +152,35 @@ function update_expense(elem, key) {
   }
 }
 
+function edit_btn(text, type, datai, i){
+  return "<span id='expense_update_field"+i+"'>"+text+"</span>";
+}
+
+function format_time(time) {
+  var timestr = (time.getMonth()+1)+"/"+time.getDate();
+  return timestr;
+}
+
+function format_dollars(amt) {
+  if(amt === "" || !isNum(amt)) {
+    return "(missing)";
+  } else {
+    return "$"+Number(amt).toFixed(2);
+  }
+}
+
 function render_expenses() {
   function render_expenses_response(data) {
-    var text = '<table class="pure-table">';
+    var text = '<table class="pure-table expense-table">';
     text += '<thead><tr><th>Time</th><th>Expense</th><th>Category</th><th>Account</th><th>Amount</th><th></th></tr></thead><tbody>';
     for(var i = 0; i < data.length; i++) {
       var time = new Date(data[i][1]["timestamp"]*1000);
-      var timestr = (time.getMonth()+1)+"/"+time.getDate()+"/"+time.getFullYear() + " " + time.getHours()+":"+time.getMinutes();
+      var timestr = format_time(time);
       var desc = data[i][1]["description"] || "(missing)";
       var cat = data[i][1]["category"] || "(missing)";
       var acct = data[i][1]["account"] || "(missing)";
-      var amt = data[i][1]["amount"] || "(missing)";
-      text += "<tr><td>"+timestr+"</td><td>"+desc+"</td><td>"+cat+"</td><td>"+acct+"</td><td>"+amt+"</td><td><button class='pure-button' id='expense_update"+i+"'>Update</button></td></tr>";
+      var amt = format_dollars(data[i][1]["amount"]);
+      text += "<tr><td>"+edit_btn(timestr,"timestamp",data[i], i)+"</td><td>"+edit_btn(desc,"description",data[i],i)+"</td><td>"+edit_btn(cat,"category",data[i],i)+"</td><td>"+edit_btn(acct,"account",data[i],i)+"</td><td class='right-align'>"+edit_btn(amt,"amount",data[i],i)+"</td><td><i class='fas fa-edit' id='expense_update"+i+"'></i><i class='fas fa-trash-alt' id='expense_delete"+i+"'></i></td></tr>"
     }
     text += "</tbody></table>";
     var update = false;
