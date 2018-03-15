@@ -46,7 +46,7 @@ a[href]:visited, a[href] {
 .expense-line {
   padding: 0.1em 0.1em;
 }
-.expense-amt {
+.expense-amt, .expense-amt-edit .raw-input {
   text-align:right;
 }
 .expense-amt-inner {
@@ -57,15 +57,24 @@ a[href]:visited, a[href] {
 }
 .expense-btns-inner {
 }
-.edit-btn {
-  margin-right:0.3em;
-}
-.del-btn {
+.edit-btn,.del-btn,.save-btn,.cancel-btn {
+  cursor:pointer;
   margin-right:0.3em;
 }
 
 .expense-clump {
   margin-bottom: 1.5em;
+}
+
+.expense-edit {
+  padding-right: 0.5em;
+}
+.raw-input {
+  width: 100%;
+  padding-left: 0.1em;
+}
+.error {
+  background-color:#FF9494;
 }
 
 @media screen and (min-width: 64em) {
