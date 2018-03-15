@@ -156,8 +156,8 @@ function edit_btn(text, type, datai, i){
   return "<span id='expense_update_field"+i+"'>"+text+"</span>";
 }
 
-function format_time(time) {
-  var timestr = (time.getMonth()+1)+"/"+time.getDate();
+function format_date(time) {
+  var timestr = (time.getMonth()+1)+"/"+time.getDate() + "/" + time.getFullYear();
   return timestr;
 }
 
@@ -169,32 +169,97 @@ function format_dollars(amt) {
   }
 }
 
+function render_expense(datai) {
+  var time = dateFromTimestamp(datai[1]["timestamp"]);
+  var timestr = format_date(time);
+  var description = datai[1]["description"] || "(missing description)";
+  var category = datai[1]["category"] || "(uncategorized)";
+  var account = datai[1]["account"] || "(missing account)";
+  var amount = format_dollars(datai[1]["amount"]);
+  var outer = document.createElement("div");
+  var line = document.createElement("div");
+  var desc = document.createElement("span");
+  var cat = document.createElement("span");
+  var acct = document.createElement("span");
+  var amt = document.createElement("span");
+  outer.className = "expense-outer";
+  line.className = "expense-line pure-g";
+  desc.innerText = description;
+  desc.className = "expense-description pure-u-lg-1-2 pure-u-1-1";
+  cat.innerText = category;
+  cat.className = "expense-category pure-u-lg-1-6 pure-u-1-3";
+  acct.innerText = account;
+  acct.className = "expense-acct pure-u-lg-1-6 pure-u-1-3";
+  amt.innerText = amount;
+  amt.className = "expense-amt pure-u-lg-1-6 pure-u-1-3";
+  line.appendChild(desc);
+  line.appendChild(cat);
+  line.appendChild(acct);
+  line.appendChild(amt);
+  outer.appendChild(line);
+  return outer;
+      //text += "<tr><td>"+edit_btn(timestr,"timestamp",data[i], i)+"</td><td>"+edit_btn(desc,"description",data[i],i)+"</td><td>"+edit_btn(cat,"category",data[i],i)+"</td><td>"+edit_btn(acct,"account",data[i],i)+"</td><td class='right-align'>"+edit_btn(amt,"amount",data[i],i)+"</td><td><i class='fas fa-edit' id='expense_update"+i+"'></i><i class='fas fa-trash-alt' id='expense_delete"+i+"'></i></td></tr>"
+}
+
+function render_expense_date(clump, datestr) {
+  var outer = document.createElement("div");
+  var line = document.createElement("div");
+  outer.className = "expense-clump";
+  line.className = "expense-outer-heading";
+  line.innerText = datestr;
+  outer.appendChild(line);
+
+  for(var i =0; i < clump.length; i++) {
+    outer.appendChild(render_expense(clump[i]));
+  }
+  return outer;
+}
+
+function hash_data(data) {
+  return JSON.stringify(data);
+}
+
+function dateFromTimestamp(tstmp) {
+  return new Date(tstmp*1000);
+}
+
 function render_expenses() {
   function render_expenses_response(data) {
-    var text = '<table class="pure-table expense-table">';
-    text += '<thead><tr><th>Time</th><th>Expense</th><th>Category</th><th>Account</th><th>Amount</th><th></th></tr></thead><tbody>';
-    for(var i = 0; i < data.length; i++) {
-      var time = new Date(data[i][1]["timestamp"]*1000);
-      var timestr = format_time(time);
-      var desc = data[i][1]["description"] || "(missing)";
-      var cat = data[i][1]["category"] || "(missing)";
-      var acct = data[i][1]["account"] || "(missing)";
-      var amt = format_dollars(data[i][1]["amount"]);
-      text += "<tr><td>"+edit_btn(timestr,"timestamp",data[i], i)+"</td><td>"+edit_btn(desc,"description",data[i],i)+"</td><td>"+edit_btn(cat,"category",data[i],i)+"</td><td>"+edit_btn(acct,"account",data[i],i)+"</td><td class='right-align'>"+edit_btn(amt,"amount",data[i],i)+"</td><td><i class='fas fa-edit' id='expense_update"+i+"'></i><i class='fas fa-trash-alt' id='expense_delete"+i+"'></i></td></tr>"
-    }
-    text += "</tbody></table>";
+    var hash = hash_data(data);
     var update = false;
-    if(text !== state.expenseinner) {
+    if(hash !== state.expenseinner) {
       update = true;
-      state.expenseinner = text;
-      document.getElementById("expenses").innerHTML = text;
+      state.expenseinner = hash;
     }
-    for(let i = 0; i < data.length; i++) {
+    if(update) {
+      var node = document.getElementById("expenses");
+      var cNode = node.cloneNode(false);
+      //var text = '<table class="pure-table expense-table">';
+      //text += '<thead><tr><th>Time</th><th>Expense</th><th>Category</th><th>Account</th><th>Amount</th><th></th></tr></thead><tbody>';
+      var prev_date = null;
+      var clump = [];
+      for(var i = 0; i < data.length; i++) {
+        var time = dateFromTimestamp(data[i][1]["timestamp"]);
+        var fmt = format_date(time);
+        if(fmt !== prev_date && clump.length > 0){
+          cNode.appendChild(render_expense_date(clump, prev_date));
+          clump.length = 0;
+        }
+        prev_date = fmt;
+        clump.push(data[i]);
+      }
+      if(clump.length > 0){
+        cNode.appendChild(render_expense_date(clump, prev_date));
+      }
+      //text += "</tbody></table>";
+      node.parentNode.replaceChild(cNode ,node);
+    }
+    /*for(let i = 0; i < data.length; i++) {
       let elem = document.getElementById("expense_update"+i);
       elem.onclick = function() {
         update_expense(elem, data[i][0]);
       }
-    }
+    }*/
     if(update) {
       var cat_sums = {};
       var cats = [];

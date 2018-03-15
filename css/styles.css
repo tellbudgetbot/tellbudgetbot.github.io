@@ -14,10 +14,10 @@ a[href]:visited, a[href] {
 }
 
 .pure-table {
-  font-size: 0.8em;
+  font-size: 0.9em;
 }
 .pure-table td, .pure-table th {
-  padding: 0.1em 0.2em;
+  padding: 0.3em 0.3em;
   line-height: 1em;
 }
 
@@ -30,8 +30,26 @@ a[href]:visited, a[href] {
 
 .content {
   padding: 0 0.5em;
+  max-width: 1000px;
 }
 
-.right-align {
+.expense-outer {
+  padding: 0.1em 0.1em;
+  border-bottom: 1px solid #888888;
+}
+.expense-outer-heading {
+  padding: 0.1em 0.1em;
+  border-bottom: 2px solid #888888;
+  font-weight: bold;
+}
+
+.expense-line {
+  padding: 0.1em 0.1em;
+}
+.expense-amt {
   text-align:right;
+}
+
+.expense-clump {
+  margin-bottom: 1.5em;
 }
