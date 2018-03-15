@@ -63,6 +63,9 @@ function signup(){
     console.log('Error');
   });
 }
+function startsWith(str,start){
+  return str.length >= start.length && str.substr(0,start.length) == start;
+}
 function is_valid_redirect(redirect_uri) {
   var uris = ["https://pitangui.amazon.com/spa/skill/account-linking-status.html?vendorId=M1MY1UQEEEFTLT",
               "https://layla.amazon.com/spa/skill/account-linking-status.html?vendorId=M1MY1UQEEEFTLT",
@@ -72,7 +75,10 @@ function is_valid_redirect(redirect_uri) {
       return true;
     }
   }
-  return true;
+  if(startsWith(redirect_uri, "https://facebook.com/messenger_platform/account_linking/")) {
+    return true;
+  }
+  return false;
 }
 function redir(user,data){
   if(window.location.search.indexOf("alexa")!==-1){
@@ -91,7 +97,6 @@ function redir(user,data){
 		var link_token = getParameterByName("account_linking_token", url);
 		var client_id = getParameterByName("client_id", url);
 		var redirect_uri = getParameterByName("redirect_uri", url);
-    console.log(redirect_uri);
     if(client_id == "messenger" && is_valid_redirect(redirect_uri)) {
       document.location.href=redirect_uri + "&account_linking_token="+link_token+"&authorization_code="+data.token;
       return;
