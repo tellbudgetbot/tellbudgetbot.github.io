@@ -32,10 +32,10 @@ var state = {
 
 function update_balance(elem, key) {
   var balance = prompt("Enter new balance");
-  if(isNum(balance)) {
+  if(isDollarNum(balance)) {
     var data = auth();
     data["account"] = key;
-    data["balance"]=Number(balance);
+    data["balance"] = parseDollarNum(balance);
     $.ajax({
         type: "POST",
         url: host+"/set_balance",
@@ -106,6 +106,11 @@ function render_balances() {
     if(state.accountselinner!==options) {
       accountsel.innerHTML=options;
       state.accountselinner=options;
+      if(data.length > 0) {
+        $(accountsel).show();
+      } else {
+        $(accountsel).hide();
+      }
     }
   };
   $.ajax({
@@ -226,9 +231,9 @@ function render_expense(datai) {
 
   edit.addEventListener("click", function() {
     amt_edit.raw.value = format_raw_dollars(datai[1]["amount"]);
-    cat_edit.raw.value = datai[1]["category"];
-    acct_edit.raw.value = datai[1]["account"];
-    desc_edit.raw.value = datai[1]["description"];
+    cat_edit.raw.value = datai[1]["category"] || "";
+    acct_edit.raw.value = datai[1]["account"] || "";
+    desc_edit.raw.value = datai[1]["description"] || "";
     amt_edit.className = "expense-edit expense-amt-edit";
     cat_edit.className = "expense-edit";
     acct_edit.className = "expense-edit";
@@ -347,27 +352,30 @@ function render_expenses() {
     state.last_change = raw_data.last_change;
     var data = raw_data.items;
 
-    var node = document.getElementById("expenses");
-    var cNode = node.cloneNode(false);
-    //var text = '<table class="pure-table expense-table">';
-    //text += '<thead><tr><th>Time</th><th>Expense</th><th>Category</th><th>Account</th><th>Amount</th><th></th></tr></thead><tbody>';
-    var prev_date = null;
-    var clump = [];
-    for(var i = 0; i < data.length; i++) {
-      var time = dateFromTimestamp(data[i][1]["timestamp"]);
-      var fmt = format_date(time);
-      if(fmt !== prev_date && clump.length > 0){
-        cNode.appendChild(render_expense_date(clump, prev_date));
-        clump.length = 0;
+    if(data.length > 0) {
+      document.getElementById('welcome-expenses').innerText="";
+      var node = document.getElementById("expenses");
+      var cNode = node.cloneNode(false);
+      var prev_date = null;
+      var clump = [];
+      for(var i = 0; i < data.length; i++) {
+        var time = dateFromTimestamp(data[i][1]["timestamp"]);
+        var fmt = format_date(time);
+        if(fmt !== prev_date && clump.length > 0){
+          cNode.appendChild(render_expense_date(clump, prev_date));
+          clump.length = 0;
+        }
+        prev_date = fmt;
+        clump.push(data[i]);
       }
-      prev_date = fmt;
-      clump.push(data[i]);
+      if(clump.length > 0){
+        cNode.appendChild(render_expense_date(clump, prev_date));
+      }
+      node.parentNode.replaceChild(cNode ,node);
+    } else {
+        document.getElementById("welcome-expenses").innerText = "Once you enter in some expenses, they'll appear here.";
+
     }
-    if(clump.length > 0){
-      cNode.appendChild(render_expense_date(clump, prev_date));
-    }
-    //text += "</tbody></table>";
-    node.parentNode.replaceChild(cNode ,node);
 
     var cat_sums = {};
     var cats = [];
@@ -391,13 +399,20 @@ function render_expenses() {
       document.getElementById("warnings").innerText = "";
     }
     if(categoryPieChart) {
-      categoryPieChart.data.labels.length = 0;
-      categoryPieChart.data.datasets[0].data.length = 0;
-      for(var i = 0; i < cats.length; i++) {
-        categoryPieChart.data.labels.push(cats[i]);
-        categoryPieChart.data.datasets[0].data.push(cat_sums[cats[i]]);
+      if(cats.length > 0) {
+        $("#pieChartContainer").show();
+        categoryPieChart.data.labels.length = 0;
+        categoryPieChart.data.datasets[0].data.length = 0;
+        for(var i = 0; i < cats.length; i++) {
+          categoryPieChart.data.labels.push(cats[i]);
+          categoryPieChart.data.datasets[0].data.push(cat_sums[cats[i]]);
+        }
+        categoryPieChart.update();
+        document.getElementById("welcome-explore").innerText = "";
+      } else {
+        $("#pieChartContainer").hide();
+        document.getElementById("welcome-explore").innerText = "Welcome to Budget Bot! Once you enter in some expenses, you'll be able to visualize your spending here.";
       }
-      categoryPieChart.update();
     }
   }
   var dt = auth();

@@ -63,7 +63,7 @@
 						<div id="add-expense">
             <form class="pure-form-stacked" onsubmit="submit_expense(); return false;">
                 <fieldset>
-                <input id="description" type="text" placeholder="Expense">
+                <input id="description" type="text" placeholder="Description">
                 <input id="amount" type="text" placeholder="Amount">
                 <input id="category" type="text" placeholder="Category">
                 <select id="account-sel"></select>
@@ -78,10 +78,12 @@
               <canvas id="pieChart" width="500" height="500"></canvas>
             </div>
             <div id="warnings"></div>
+            <div id="welcome-explore"></div>
 				</div>
 				<div class="content">
             <h2 class="content-subhead"><a class='anchor' name='view'>View Expenses</a></h2>
 						<div id="expenses"></div>
+            <div id="welcome-expenses"></div>
 				</div>
         <div class="content">
             <h2 class="content-subhead"><a class='anchor' name='account'>Account</a></h2>
