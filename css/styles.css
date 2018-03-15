@@ -49,6 +49,20 @@ a[href]:visited, a[href] {
 .expense-amt {
   text-align:right;
 }
+.expense-amt-inner {
+  padding-right:1em;
+}
+.expense-btns {
+  text-align:right;
+}
+.expense-btns-inner {
+}
+.edit-btn {
+  margin-right:0.5em;
+}
+.del-btn {
+  margin-right:1em;
+}
 
 .expense-clump {
   margin-bottom: 1.5em;
