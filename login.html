@@ -72,7 +72,7 @@ function is_valid_redirect(redirect_uri) {
       return true;
     }
   }
-  return false;
+  return true;
 }
 function redir(user,data){
   if(window.location.search.indexOf("alexa")!==-1){
@@ -84,6 +84,16 @@ function redir(user,data){
 		var redirect_uri = getParameterByName("redirect_uri", url);
     if(client_id == "alexa" && is_valid_redirect(redirect_uri)) {
       document.location.href=redirect_uri+"#state="+state+"&access_token="+data.token+"&token_type=Bearer";
+      return;
+    }
+  } else if(window.location.search.indexOf("messenger")!==-1) {
+		var url = window.location.href;
+		var link_token = getParameterByName("account_linking_token", url);
+		var client_id = getParameterByName("client_id", url);
+		var redirect_uri = getParameterByName("redirect_uri", url);
+    console.log(redirect_uri);
+    if(client_id == "messenger" && is_valid_redirect(redirect_uri)) {
+      document.location.href=redirect_uri + "&account_linking_token="+link_token+"&authorization_code="+data.token;
       return;
     }
   }
