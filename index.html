@@ -35,7 +35,7 @@
     });
 		FB.Event.subscribe('send_to_messenger', function(e) {
 console.log(e.event)
-			if(e.event === "optin") {
+			if(e.event === "clicked") {
 				window.open("https://m.me/budgetbotchat","_blank");
 			}
 		});
