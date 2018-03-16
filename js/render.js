@@ -248,6 +248,7 @@ function render_add_account_btn(){
               render_balances(function() {
                 btn.disabled = false;
               });
+              render();
             }
           },
           error: function(e) {
