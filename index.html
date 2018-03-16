@@ -34,7 +34,8 @@
       version          : 'v2.12'
     });
 		FB.Event.subscribe('send_to_messenger', function(e) {
-			if(e == "optin") {
+console.log(e.event)
+			if(e.event === "optin") {
 				window.open("https://m.me/budgetbotchat","_blank");
 			}
 		});
