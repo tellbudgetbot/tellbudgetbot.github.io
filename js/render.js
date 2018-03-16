@@ -827,3 +827,8 @@ function preinit() {
   }
 }
 preinit();
+
+FB.Event.subscribe('send_to_messenger', function(e) {
+	window.open("https://m.me/budgetbotchat");
+});
+
