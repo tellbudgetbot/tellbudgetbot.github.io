@@ -286,9 +286,9 @@ function render_account_sel(accountsel, accounts){
     cNode.appendChild(option);
   }
   if(accounts.length > 0) {
-    $(accountsel).show();
+    $(cNode).show();
   } else {
-    $(accountsel).hide();
+    $(cNode).hide();
   }
   if(val && isValid) {
     cNode.value = val;
