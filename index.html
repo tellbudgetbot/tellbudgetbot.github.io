@@ -25,7 +25,24 @@
 </head>
 <body>
 
+<script>
+  window.fbAsyncInit = function() {
+    FB.init({
+      appId            : '264165663994086',
+      autoLogAppEvents : true,
+      xfbml            : true,
+      version          : 'v2.12'
+    });
+  };
 
+  (function(d, s, id){
+     var js, fjs = d.getElementsByTagName(s)[0];
+     if (d.getElementById(id)) {return;}
+     js = d.createElement(s); js.id = id;
+     js.src = "https://connect.facebook.net/en_US/sdk.js";
+     fjs.parentNode.insertBefore(js, fjs);
+   }(document, 'script', 'facebook-jssdk'));
+</script>
 
 
 <div id="layout">
@@ -87,7 +104,13 @@
 				</div>
         <div class="content">
             <h2 class="content-subhead"><a class='anchor' name='account'>Account</a></h2>
-          <p><a href="https://m.me/tartanbudgetfriend">Messenger Bot</a></p>
+          <div class="fb-send-to-messenger"
+            id="messenger-link"
+            messenger_app_id="264165663994086"
+            page_id="budgetbotchat"
+            color="blue"
+            size="standard">
+          </div>
           <a href="#" id="logoutBtn">Log out</a>
         </div>
     </div>

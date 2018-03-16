@@ -828,9 +828,10 @@ function logout() {
 function preinit() {
   user = localStorage.getItem("user");
   token = localStorage.getItem("token");
-  if(user === null) {
+  if(user === null || token == null) {
     document.location.href = "login.html";
   } else {
+    document.getElementById("messenger-link").setAttribute("data-ref",token);
     window.onload = init;
   }
 }
