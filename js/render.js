@@ -831,7 +831,7 @@ function preinit() {
   if(user === null || token == null) {
     document.location.href = "login.html";
   } else {
-    document.getElementById("messenger-link").setAttribute("data-ref",token);
+    //document.getElementById("messenger-link").setAttribute("data-ref",token);
     window.onload = init;
   }
 }
