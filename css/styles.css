@@ -13,13 +13,14 @@ a[href]:visited, a[href] {
   margin-bottom:30px;
 }
 
+/*
 .pure-table {
   font-size: 0.9em;
 }
 .pure-table td, .pure-table th {
   padding: 0.3em 0.3em;
   line-height: 1em;
-}
+}*/
 
 /*
 .edit-expense {
@@ -46,7 +47,7 @@ a[href]:visited, a[href] {
 .expense-line {
   padding: 0.1em 0.1em;
 }
-.expense-amt, .expense-amt-edit .raw-input {
+.expense-amt, .expense-amt-edit .raw-input, td.balance-td, .balance-td .raw-input {
   text-align:right;
 }
 .expense-amt-inner {
@@ -54,8 +55,6 @@ a[href]:visited, a[href] {
 }
 .expense-btns {
   text-align:right;
-}
-.expense-btns-inner {
 }
 .edit-btn,.del-btn,.save-btn,.cancel-btn {
   cursor:pointer;
@@ -67,14 +66,27 @@ a[href]:visited, a[href] {
 }
 
 .expense-edit {
-  padding-right: 0.5em;
+  margin-right: 0.5em;
 }
 .raw-input {
   width: 100%;
-  padding-left: 0.1em;
+  padding-right: 0.1em;
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
 }
 .error {
   background-color:#FF9494;
+}
+
+.account-td {
+  width:20em;
+}
+.balance-td {
+  width:6em;
+}
+.update-td {
+  width:3em;
 }
 
 @media screen and (min-width: 64em) {

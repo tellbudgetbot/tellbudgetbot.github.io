@@ -26,8 +26,9 @@ function isDollarNum(num) {
 }
 
 var state = {
-  "accountselinner": null,
-  "last_change": "(unknown)"
+  "last_account_change": "(unknown)",
+  "last_expense_change": "(unknown)",
+  "accounts": []
 };
 
 function update_balance(elem, key) {
@@ -53,72 +54,276 @@ function update_balance(elem, key) {
   }
 
 }
-function add_account(){
-  var name = prompt("Enter account name");
-  if(name.length >= 1) {
-    var data = auth();
-    data["account"] = name;
-    data["balance"] = 0;
-    $.ajax({
-        type: "POST",
-        url: host+"/set_balance",
-        data: data,
-        dataType: "json",
-        success: function(data) {
-          console.log(data);
-          if(data) {
-            render_balances();
-          }
-        }
-    });
-  } else {
-    alert("Not a valid name");
-  }
+function render_account_heading() {
+  var thead = document.createElement("thead");
+  var tr = document.createElement("tr");
+  var acct_td = document.createElement("th");
+  var balance_td = document.createElement("th");
+  var update_td = document.createElement("th");
+  acct_td.innerText="Account";
+  balance_td.innerText="Balance";
+  acct_td.className="account-td";
+  balance_td.className="balance-td";
+  update_td.className="update-td";
+  tr.appendChild(acct_td);
+  tr.appendChild(balance_td);
+  tr.appendChild(update_td);
+  thead.appendChild(tr);
+  return thead;
 }
 
-function render_balances() {
-  function render_balance_response(data) {
-    var text = '<table class="pure-table">';
-    text += '<thead><tr><th>Account</th><th>Balance</th><th></th></tr></thead><tbody>';
+function render_account(datai) {
+  var tr = document.createElement("tr");
+  var acct_td = document.createElement("td");
+  var balance_td = document.createElement("td");
+  var acct_inner = document.createElement("span");
+  var balance_inner = document.createElement("span");
+  var buttons_inner = document.createElement("span");
+  var buttons_edit = document.createElement("span");
+  var update_td = document.createElement("td");
+  var edit_btn = make_btn("fa-edit");
+  var del_btn = make_btn("fa-trash-alt");
+  var save_btn = make_btn("fa-check");
+  var cancel_btn = make_btn("fa-ban");
+  var acct_edit = make_input();
+  var balance_edit = make_input();
+  edit_btn.className = "edit-btn";
+  del_btn.className = "del-btn";
+  save_btn.className = "save-btn";
+  cancel_btn.className = "cancel-btn";
+  buttons_inner.appendChild(edit_btn);
+  buttons_inner.appendChild(del_btn);
+  buttons_edit.appendChild(save_btn);
+  buttons_edit.appendChild(cancel_btn);
+  acct_inner.innerText = datai[1];
+  balance_inner.innerText = format_dollars(datai[2]);
+  edit_btn.addEventListener("click", function() {
+    balance_edit.raw.value = format_raw_dollars(datai[2]);
+    acct_edit.raw.value = datai[1] || "";
+    balance_edit.className = "account-edit account-amt-edit";
+    acct_edit.className = "account-edit";
+    balance_td.replaceChild(balance_edit, balance_inner);
+    acct_td.replaceChild(acct_edit, acct_inner);
+    update_td.replaceChild(buttons_edit, buttons_inner);
+  });
+  function showInner() {
+    balance_td.replaceChild(balance_inner, balance_edit);
+    acct_td.replaceChild(acct_inner, acct_edit);
+    update_td.replaceChild(buttons_inner, buttons_edit);
+  }
+  cancel_btn.addEventListener("click", function() {
+    showInner();
+  });
+  save_btn.addEventListener("click", function() {
+    var newBalance = balance_edit.raw.value;
+    var newAcct = acct_edit.raw.value;
+    if(!isDollarNum(newBalance)) {
+      $(balance_edit.raw).addClass("error");
+      return;
+    } else {
+      $(balance_edit.raw).removeClass("error");
+    }
+    newBalance = parseDollarNum(newBalance);
+    balance_inner.innerText = format_dollars(newBalance);
+    acct_inner.innerText = newAcct;
+    showInner();
+    if(Math.abs(newBalance - datai[2]) > 0.001) {
+      var data = auth();
+      data["accountid"] = datai[0];
+      data["balance"] = newBalance;
+      $.ajax({
+          type: "POST",
+          url: host+"/set_balance",
+          data: data,
+          dataType: "json",
+          success: function(data) {
+            if(data && data.error) {
+              alert(data.error);
+            }
+            render_balances();
+          }
+      });
+    }
+    if(newAcct != datai[1]) {
+      var data = auth();
+      data["accountid"] = datai[0];
+      data["accountname"] = newAcct;
+      $.ajax({
+          type: "POST",
+          url: host+"/update_account",
+          data: data,
+          dataType: "json",
+          success: function(data) {
+            if(data && data.error) {
+              alert(data.error);
+            }
+            render_balances();
+          }
+      });
+    }
+  });
+  del_btn.addEventListener("click", function() {
+    if(confirm("CAUTION: Are you sure you want to delete this account? All budget items currently filed to this account will no longer be associated with it.")) {
+      var data = auth();
+      data["accountid"] = datai[0];
+      tr.parentNode.removeChild(tr);
+      $.ajax({
+          type: "POST",
+          url: host+"/delete_account",
+          data: data,
+          dataType: "json",
+          success: function(data) {
+            if(data) {
+              render();
+            }
+          }
+      });
+    }
+  });
+  acct_td.className="account-td";
+  balance_td.className="balance-td";
+  update_td.className="update-td";
+  acct_td.appendChild(acct_inner);
+  balance_td.appendChild(balance_inner);
+  update_td.appendChild(buttons_inner);
+  tr.appendChild(acct_td);
+  tr.appendChild(balance_td);
+  tr.appendChild(update_td);
+  return tr;
+}
+
+function render_add_account_btn(){
+  var btn = document.createElement("button");
+  function add_account(){
+    if(btn.disabled) {
+      return;
+    }
+    var name = prompt("Enter account name");
+    if(name && name.length >= 1) {
+      btn.disabled = true;
+      var data = auth();
+      data["account"] = name;
+      data["balance"] = 0;
+      $.ajax({
+          type: "POST",
+          url: host+"/add_account",
+          data: data,
+          dataType: "json",
+          success: function(data) {
+            if(data) {
+              if(data.error) {
+                alert(data.error);
+              }
+              render_balances(function() {
+                btn.disabled = false;
+              });
+            }
+          },
+          error: function(e) {
+            console.log(e);
+            btn.disabled = false;
+          }
+      });
+    }
+  }
+  var p = document.createElement("p");
+  btn.innerText = "Add Account";
+  btn.className="pure-button";
+  btn.addEventListener("click", add_account);
+  p.appendChild(btn);
+  return p;
+}
+
+function render_account_sel(accountsel, accounts){
+  var cNode = null;
+  var val = null;
+  if(accountsel) {
+    cNode = accountsel.cloneNode(false);
+    val = accountsel.value;
+  } else {
+    cNode = document.createElement("select");
+  }
+  var isValid = false;
+  for(var i = 0; i < accounts.length; i++) {
+    var option = document.createElement("option");
+    option.value = accounts[i][0];
+    if(accounts[i][0] == val) {
+      isValid = true;
+    }
+    option.innerText = accounts[i][1];
+    cNode.appendChild(option);
+  }
+  if(accounts.length > 0) {
+    $(accountsel).show();
+  } else {
+    $(accountsel).hide();
+  }
+  if(val && isValid) {
+    cNode.value = val;
+  }
+  if(accountsel) {
+    accountsel.parentNode.replaceChild(cNode, accountsel);
+  }
+  return cNode;
+}
+
+function render_balance_response(raw_data) {
+  if(raw_data.cached) {
+    return;
+  }
+  state.last_account_change = raw_data.last_change;
+  var data = raw_data.accounts;
+
+  var node = document.getElementById("balances");
+  var cNode = node.cloneNode(false);
+
+  if(data.length > 0) {
+    var table = document.createElement("table");
+    table.className="pure-table";
+    table.appendChild(render_account_heading());
+    var tbody = document.createElement("tbody");
+
     for(var i = 0; i < data.length; i++) {
-      text += "<tr><td>"+data[i][0]+"</td><td>"+format_dollars(data[i][1])+"</td><td><button class='pure-button' id='acct_update"+i+"'>Update</button></td></tr>";
+      tbody.appendChild(render_account(data[i]));
     }
-    text += "</tbody></table>";
-    text += "<p><button class='pure-button' id='acct_add'>Add Account</button></p>";
-    document.getElementById("balances").innerHTML = text;
-    for(let i = 0; i < data.length; i++) {
-      let elem = document.getElementById("acct_update"+i);
-      elem.onclick = function() {
-        update_balance(elem, data[i][0]);
-      };
+    table.appendChild(tbody);
+    cNode.appendChild(table);
+  } else {
+    var p = document.createElement("p");
+    p.innerText = "No accounts yet. Go ahead and add one!";
+    cNode.appendChild(p);
+  }
+  cNode.appendChild(render_add_account_btn());
+  node.parentNode.replaceChild(cNode, node);
+
+  state.accounts = data;
+
+  var options = "";
+  var suggest = "";
+  for(var i = 0; i < data.length; i++) {
+    if(data[i][1] < 0) {
+      suggest += "Suggestion: Your balance in " + data[i][1] + " is negative, which may lead to high fees and/or interest. Consider paying this debt first before saving money in other accounts.<br>"
     }
-    document.getElementById("acct_add").onclick = add_account;
-    var options = "";
-    var suggest = "";
-    for(var i = 0; i < data.length; i++) {
-      options += '<option value="'+data[i][0]+'">'+data[i][0]+"</option>";
-      if(data[i][1] < 0) {
-        suggest += "Suggestion: Your balance in " + data[i][0] + " is negative, which may lead to high fees and/or interest. Consider paying this debt first before saving money in other accounts.<br>"
-      }
-    }
-    document.getElementById("warning1").innerHTML=suggest;
-    var accountsel = document.getElementById("account-sel");
-    if(state.accountselinner!==options) {
-      accountsel.innerHTML=options;
-      state.accountselinner=options;
-      if(data.length > 0) {
-        $(accountsel).show();
-      } else {
-        $(accountsel).hide();
-      }
-    }
-  };
+  }
+  document.getElementById("warning1").innerHTML=suggest;
+  var accountsel = document.getElementById("account-sel");
+  render_account_sel(accountsel, data);
+};
+
+function render_balances(callback) {
+  var dt = auth();
+  dt["last_change"] = state.last_account_change;
   $.ajax({
       type: "POST",
       url: host+"/get_balances",
-      data: auth(),
+      data: dt,
       dataType: "json",
-      success: render_balance_response
+      success: function(data) {
+        render_balance_response(data);
+        if(callback) {
+          callback(data);
+        }
+      }
   });
 }
 
@@ -152,11 +357,16 @@ function format_date(time) {
   return timestr;
 }
 
+function sign(num) {
+  return num >=0 ? "" : "-";
+}
+
 function format_dollars(amt) {
   if(amt === "" || !isNum(amt)) {
     return "(missing)";
   } else {
-    return "$"+Number(amt).toFixed(2);
+    var num = Number(amt);
+    return sign(num)+"$"+Math.abs(num).toFixed(2);
   }
 }
 function format_raw_dollars(amt) {
@@ -178,8 +388,17 @@ function make_input() {
   var input = document.createElement("input");
   var outer = document.createElement("div");
   input.className = "raw-input";
+  input.type="text";
   outer.appendChild(input);
   outer.raw = input;
+  return outer;
+}
+function make_account_sel() {
+  var outer = document.createElement("div");
+  var select = render_account_sel(null, state.accounts);
+  select.className = "raw-input";
+  outer.appendChild(select);
+  outer.raw = select;
   return outer;
 }
 
@@ -188,7 +407,7 @@ function render_expense(datai) {
   var timestr = format_date(time);
   var description = datai[1]["description"] || "(missing description)";
   var category = datai[1]["category"] || "(uncategorized)";
-  var account = datai[1]["account"] || "(missing account)";
+  var account = datai[1]["account_name"] || "(missing account)";
   var amount = format_dollars(datai[1]["amount"]);
   var outer = document.createElement("div");
   var line = document.createElement("div");
@@ -202,7 +421,7 @@ function render_expense(datai) {
   var amt_inner = document.createElement("span");
   var desc_edit = make_input();
   var cat_edit = make_input();
-  var acct_edit = make_input();
+  var acct_edit = make_account_sel();
   var amt_edit = make_input();
   var btns = document.createElement("span");
   var btns_inner = document.createElement("span");
@@ -255,9 +474,10 @@ function render_expense(datai) {
           data: data,
           dataType: "json",
           success: function(data) {
-            if(data) {
-              render();
+            if(data && data.error) {
+              alert(data.error);
             }
+            render();
           }
       });
     }
@@ -277,23 +497,27 @@ function render_expense(datai) {
     var newDesc = desc_edit.raw.value;
     var newCat = cat_edit.raw.value;
     var newAcct = acct_edit.raw.value;
-    if(newAmt.length == 0 || !isDollarNum(newAmt)) {
+    if(!isDollarNum(newAmt)) {
       $(amt_edit.raw).addClass("error");
       return;
     } else {
       $(amt_edit.raw).removeClass("error");
     }
-    amt_inner.innerText = newAmt;
+    newAmt = parseDollarNum(newAmt);
+    amt_inner.innerText = format_dollars(newAmt);
     desc_inner.innerText = newDesc;
     cat_inner.innerText = newCat;
-    acct_inner.innerText = newAcct;
+    var idx = acct_edit.raw.selectedIndex;
+    if(idx >= 0) {
+      acct_inner.innerText = acct_edit.raw.options[acct_edit.raw.selectedIndex].text;
+    }
     showInner();
     var data = auth();
     data["key"] = datai[0];
     data["description"] = newDesc;
     data["category"] = newCat;
     data["account"] = newAcct;
-    data["amount"] = parseDollarNum(newAmt);
+    data["amount"] = newAmt;
     $.ajax({
         type: "POST",
         url: host+"/add",
@@ -323,7 +547,6 @@ function render_expense(datai) {
   line.appendChild(btns);
   outer.appendChild(line);
   return outer;
-      //text += "<tr><td>"+edit_btn(timestr,"timestamp",data[i], i)+"</td><td>"+edit_btn(desc,"description",data[i],i)+"</td><td>"+edit_btn(cat,"category",data[i],i)+"</td><td>"+edit_btn(acct,"account",data[i],i)+"</td><td class='right-align'>"+edit_btn(amt,"amount",data[i],i)+"</td><td><i class='fas fa-edit' id='expense_update"+i+"'></i><i class='fas fa-trash-alt' id='expense_delete"+i+"'></i></td></tr>"
 }
 
 function render_expense_date(clump, datestr) {
@@ -349,7 +572,7 @@ function render_expenses() {
     if(raw_data.cached) {
       return;
     }
-    state.last_change = raw_data.last_change;
+    state.last_expense_change = raw_data.last_change;
     var data = raw_data.items;
 
     if(data.length > 0) {
@@ -404,8 +627,10 @@ function render_expenses() {
         categoryPieChart.data.labels.length = 0;
         categoryPieChart.data.datasets[0].data.length = 0;
         for(var i = 0; i < cats.length; i++) {
-          categoryPieChart.data.labels.push(cats[i]);
-          categoryPieChart.data.datasets[0].data.push(cat_sums[cats[i]]);
+          if(cat_sums[cats[i]] > 0) {
+            categoryPieChart.data.labels.push(cats[i]);
+            categoryPieChart.data.datasets[0].data.push(cat_sums[cats[i]]);
+          }
         }
         categoryPieChart.update();
         document.getElementById("welcome-explore").innerText = "";
@@ -416,7 +641,7 @@ function render_expenses() {
     }
   }
   var dt = auth();
-  dt["last_change"] = state.last_change;
+  dt["last_change"] = state.last_expense_change;
   $.ajax({
       type: "POST",
       url: host+"/view_30days",
@@ -466,9 +691,10 @@ function submit_expense() {
 }
 
 function render() {
-  render_balances();
-  render_add_expense();
-  render_expenses();
+  render_balances(function(){
+    render_add_expense();
+    render_expenses();
+  });
 }
 
 function init() {
