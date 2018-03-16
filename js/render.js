@@ -87,10 +87,10 @@ function render_account(datai) {
   var cancel_btn = make_btn("fa-ban");
   var acct_edit = make_input();
   var balance_edit = make_input();
-  edit_btn.className = "edit-btn";
-  del_btn.className = "del-btn";
-  save_btn.className = "save-btn";
-  cancel_btn.className = "cancel-btn";
+  edit_btn.className = "btn edit-btn";
+  del_btn.className = "btn account-del-btn";
+  save_btn.className = "btn save-btn";
+  cancel_btn.className = "btn account-cancel-btn";
   buttons_inner.appendChild(edit_btn);
   buttons_inner.appendChild(del_btn);
   buttons_edit.appendChild(save_btn);
@@ -440,13 +440,13 @@ function render_expense(datai) {
   cat_inner.innerText = category;
   cat.className = "expense-category pure-u-lg-5-24 pure-u-9-24";
   acct_inner.innerText = account;
-  acct.className = "expense-acct pure-u-lg-5-24 pure-u-12-24";
-  btns.className = "expense-btns pure-u-lg-2-24 pure-u-3-24";
+  acct.className = "expense-acct pure-u-lg-5-24 pure-u-11-24";
+  btns.className = "expense-btns pure-u-lg-2-24 pure-u-4-24";
   btns_inner.className="expense-btns-inner";
-  edit.className = "edit-btn";
-  del.className = "del-btn";
-  save.className = "save-btn";
-  cancel.className = "cancel-btn";
+  edit.className = "btn edit-btn";
+  del.className = "btn del-btn";
+  save.className = "btn save-btn";
+  cancel.className = "btn cancel-btn";
 
   edit.addEventListener("click", function() {
     amt_edit.raw.value = format_raw_dollars(datai[1]["amount"]);

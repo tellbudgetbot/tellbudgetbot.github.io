@@ -16,11 +16,10 @@ a[href]:visited, a[href] {
 /*
 .pure-table {
   font-size: 0.9em;
-}
-.pure-table td, .pure-table th {
-  padding: 0.3em 0.3em;
-  line-height: 1em;
 }*/
+.pure-table td, .pure-table th {
+  padding: 0.5em 0.5em;
+}
 
 /*
 .edit-expense {
@@ -56,8 +55,13 @@ a[href]:visited, a[href] {
 .expense-btns {
   text-align:right;
 }
-.edit-btn,.del-btn,.save-btn,.cancel-btn {
+.btn {
   cursor:pointer;
+}
+.edit-btn, .save-btn {
+  margin-right:0.5em;
+}
+.del-btn, .cancel-btn {
   margin-right:0.3em;
 }
 
@@ -86,7 +90,7 @@ a[href]:visited, a[href] {
   width:6em;
 }
 .update-td {
-  width:3em;
+  width:2.5em;
 }
 
 @media screen and (min-width: 64em) {
