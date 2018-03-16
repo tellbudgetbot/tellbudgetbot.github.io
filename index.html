@@ -63,9 +63,9 @@
 						<div id="add-expense">
             <form class="pure-form-stacked" onsubmit="submit_expense(); return false;">
                 <fieldset>
-                <input id="description" type="text" placeholder="Description">
-                <input id="amount" type="text" placeholder="Amount">
-                <input id="category" type="text" placeholder="Category">
+                <input id="description" autocomplete="off" type="text" data-lpignore="true" placeholder="Description">
+                <input id="amount" autocomplete="off" type="text" data-lpignore="true" placeholder="Amount">
+                <input id="category" autocomplete="off" class="category-sel" data-lpignore="true" type="text" placeholder="Category">
                 <select id="account-sel"></select>
                 <button class="pure-button pure-button-primary">Submit</button>
                 </fieldset>

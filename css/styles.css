@@ -65,6 +65,12 @@ a[href]:visited, a[href] {
   margin-right:0.3em;
 }
 
+.account-del-btn, .account-cancel-btn,
+.account-save-btn, .account-edit-btn {
+  margin-left:0.2em;
+  margin-right:0.2em;
+}
+
 .expense-clump {
   margin-bottom: 1.5em;
 }
@@ -87,10 +93,12 @@ a[href]:visited, a[href] {
   width:20em;
 }
 .balance-td {
-  width:6em;
+  width:5em;
 }
 .update-td {
-  width:2.5em;
+  max-width:2.8em;
+  text-align:center;
+  line-height: 1.8em;
 }
 
 @media screen and (min-width: 64em) {

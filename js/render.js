@@ -2,13 +2,27 @@ var user=null;
 var token=null;
 var categoryPieChart = null;
 var host = "https://budget-bot.tk";
+var ACCT_PREFIX="__acct:";
+
+var state = {
+  "last_account_change": "(unknown)",
+  "last_expense_change": "(unknown)",
+  "last_category_change": "(unknown)",
+  "accounts": [],
+  "categories": []
+};
 
 function auth(){
   return {"token": token};
 }
 function parseDollarNum(num) {
+  var sign = 1;
   if(num.length == 0){
     return NaN;
+  }
+  if(num.charAt(0)=="-") {
+    num = num.substr(1);
+    sign = -1;
   }
   if(num.charAt(0)=="$") {
     num = num.substr(1);
@@ -16,7 +30,7 @@ function parseDollarNum(num) {
   if(num.length == 0) {
     return NaN;
   }
-  return Number(num);
+  return sign * Number(num);
 }
 function isNum(num){
   return !isNaN(Number(num));
@@ -24,12 +38,10 @@ function isNum(num){
 function isDollarNum(num) {
   return !isNaN(parseDollarNum(num));
 }
+function starts_with(str,pref){
+  return str.length >= pref.length && str.substr(0,pref.length) == pref;
+}
 
-var state = {
-  "last_account_change": "(unknown)",
-  "last_expense_change": "(unknown)",
-  "accounts": []
-};
 
 function update_balance(elem, key) {
   var balance = prompt("Enter new balance");
@@ -43,10 +55,14 @@ function update_balance(elem, key) {
         data: data,
         dataType: "json",
         success: function(data) {
-          console.log(data);
-          if(data) {
-            render_balances();
+          if(data && data.error) {
+            alert(data.error);
           }
+          render_balances();
+        },
+        error: function(e) {
+          alert("Server error");
+          console.log(e);
         }
     });
   } else {
@@ -87,9 +103,9 @@ function render_account(datai) {
   var cancel_btn = make_btn("fa-ban");
   var acct_edit = make_input();
   var balance_edit = make_input();
-  edit_btn.className = "btn edit-btn";
+  edit_btn.className = "btn account-edit-btn";
   del_btn.className = "btn account-del-btn";
-  save_btn.className = "btn save-btn";
+  save_btn.className = "btn account-save-btn";
   cancel_btn.className = "btn account-cancel-btn";
   buttons_inner.appendChild(edit_btn);
   buttons_inner.appendChild(del_btn);
@@ -141,6 +157,10 @@ function render_account(datai) {
               alert(data.error);
             }
             render_balances();
+          },
+          error: function(e) {
+            alert("Server error");
+            console.log(e);
           }
       });
     }
@@ -158,26 +178,37 @@ function render_account(datai) {
               alert(data.error);
             }
             render_balances();
+          },
+          error: function(e) {
+            alert("Server error");
+            console.log(e);
           }
       });
     }
   });
   del_btn.addEventListener("click", function() {
     if(confirm("CAUTION: Are you sure you want to delete this account? All budget items currently filed to this account will no longer be associated with it.")) {
-      var data = auth();
-      data["accountid"] = datai[0];
-      tr.parentNode.removeChild(tr);
-      $.ajax({
-          type: "POST",
-          url: host+"/delete_account",
-          data: data,
-          dataType: "json",
-          success: function(data) {
-            if(data) {
+      if(confirm("Please confirm that you want to delete the following account: " + datai[1])) {
+        var data = auth();
+        data["accountid"] = datai[0];
+        tr.parentNode.removeChild(tr);
+        $.ajax({
+            type: "POST",
+            url: host+"/delete_account",
+            data: data,
+            dataType: "json",
+            success: function(data) {
+              if(data && data.error) {
+                alert(data.error);
+              }
               render();
+            },
+            error: function(e) {
+              alert("Server error");
+              console.log(e);
             }
-          }
-      });
+        });
+      }
     }
   });
   acct_td.className="account-td";
@@ -221,6 +252,7 @@ function render_add_account_btn(){
           },
           error: function(e) {
             console.log(e);
+            alert("Server error");
             btn.disabled = false;
           }
       });
@@ -323,28 +355,29 @@ function render_balances(callback) {
         if(callback) {
           callback(data);
         }
+      },
+      error: function(e) {
+        console.log(e);
       }
   });
 }
 
 function render_add_expense() {
-  var cats = ["Groceries",
-              "Dining",
-              "Electronics",
-              "Entertainment",
-              "Health",
-              "Home supplies",
-              "Housing",
-              "Income",
-              "Interest",
-              "Laundry",
-              "Office supplies",
-              "Education",
-              "Transportation",
-              "Transfer",
-              "Miscellaneous"];
-  $( "#category" ).autocomplete({
-    source: cats
+  var dt = auth();
+  dt["last_change"] = state.last_category_change;
+  $.ajax({
+      type: "POST",
+      url: host+"/list_categories",
+      data: dt,
+      dataType: "json",
+      success: function(raw_data) {
+        if(raw_data.cached) {
+          return;
+        }
+        state.last_category_change = raw_data.last_change;
+        state.categories = raw_data.categories;
+        $( ".category-sel" ).autocomplete({"source": raw_data.categories});
+      }
   });
 }
 
@@ -389,6 +422,8 @@ function make_input() {
   var outer = document.createElement("div");
   input.className = "raw-input";
   input.type="text";
+  input.autocomplete="off";
+  input.setAttribute("data-lpignore", "true");
   outer.appendChild(input);
   outer.raw = input;
   return outer;
@@ -406,7 +441,7 @@ function render_expense(datai) {
   var time = dateFromTimestamp(datai[1]["timestamp"]);
   var timestr = format_date(time);
   var description = datai[1]["description"] || "(missing description)";
-  var category = datai[1]["category"] || "(uncategorized)";
+  var category = datai[1]["category_name"] || datai[1]["category"] || "(uncategorized)";
   var account = datai[1]["account_name"] || "(missing account)";
   var amount = format_dollars(datai[1]["amount"]);
   var outer = document.createElement("div");
@@ -450,11 +485,12 @@ function render_expense(datai) {
 
   edit.addEventListener("click", function() {
     amt_edit.raw.value = format_raw_dollars(datai[1]["amount"]);
-    cat_edit.raw.value = datai[1]["category"] || "";
+    cat_edit.raw.value = datai[1]["category_name"] || datai[1]["category"] || "";
     acct_edit.raw.value = datai[1]["account"] || "";
     desc_edit.raw.value = datai[1]["description"] || "";
+    $( cat_edit.raw ).autocomplete({"source": state.categories});
     amt_edit.className = "expense-edit expense-amt-edit";
-    cat_edit.className = "expense-edit";
+    cat_edit.className = "expense-edit category-sel";
     acct_edit.className = "expense-edit";
     desc_edit.className = "expense-edit";
     amt.replaceChild(amt_edit, amt_inner);
@@ -478,6 +514,10 @@ function render_expense(datai) {
               alert(data.error);
             }
             render();
+          },
+          error: function(e) {
+            alert("Server error");
+            console.log(e);
           }
       });
     }
@@ -524,9 +564,14 @@ function render_expense(datai) {
         data: data,
         dataType: "json",
         success: function(data) {
-          if(data) {
-            render();
+          if(data && data.error) {
+            alert(data.error);
           }
+          render();
+        },
+        error: function(e) {
+          alert("Server error");
+          console.log(e);
         }
     });
   });
@@ -627,7 +672,7 @@ function render_expenses() {
         categoryPieChart.data.labels.length = 0;
         categoryPieChart.data.datasets[0].data.length = 0;
         for(var i = 0; i < cats.length; i++) {
-          if(cat_sums[cats[i]] > 0) {
+          if(cat_sums[cats[i]] > 0 && !starts_with(cats[i],ACCT_PREFIX)) {
             categoryPieChart.data.labels.push(cats[i]);
             categoryPieChart.data.datasets[0].data.push(cat_sums[cats[i]]);
           }
@@ -647,7 +692,10 @@ function render_expenses() {
       url: host+"/view_30days",
       data: dt,
       dataType: "json",
-      success: render_expenses_response
+      success: render_expenses_response,
+      error: function(e) {
+        console.log(e);
+      }
   });
 }
 function get_cat(cat_sums, cat){
@@ -672,10 +720,10 @@ function submit_expense() {
   }
   if(desc.length > 0 || amt.length > 0) {
     function submit_expense_response(data) {
-      console.log(data);
-      if(data) {
-        render();
+      if(data && data.error) {
+        alert(data.error);
       }
+      render();
       document.getElementById("description").value="";
       document.getElementById("amount").value="";
       document.getElementById("category").value="";
@@ -685,7 +733,11 @@ function submit_expense() {
         url: host+"/add",
         data: data,
         dataType: "json",
-        success: submit_expense_response
+        success: submit_expense_response,
+        error: function(e) {
+          alert("Server error");
+          console.log(e);
+        }
     });
   }
 }
@@ -714,6 +766,10 @@ function setup() {
           console.log(data.error);
           logout();
         }
+      },
+      error: function(e) {
+        alert("Server error");
+        console.log(e);
       }
   });
   document.getElementById("logoutBtn").onclick = logout;
