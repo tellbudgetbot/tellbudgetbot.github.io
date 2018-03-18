@@ -34,7 +34,6 @@
       version          : 'v2.12'
     });
 		FB.Event.subscribe('send_to_messenger', function(e) {
-console.log(e.event)
 			if(e.event === "clicked") {
 				window.open("https://m.me/budgetbotchat","_blank");
 			}
@@ -63,8 +62,10 @@ console.log(e.event)
             <a class="pure-menu-heading" href="#top">Budget Bot</a>
 
             <ul class="pure-menu-list">
+                <li class="pure-menu-item"><a href="#onthego" class="pure-menu-link">On the Go</a></li>
                 <li class="pure-menu-item"><a href="#balances" class="pure-menu-link">Balances</a></li>
-                <li class="pure-menu-item"><a href="#add-expense" class="pure-menu-link">Add Expense</a></li>
+                <li class="pure-menu-item"><a href="#addexpense" class="pure-menu-link">Add Expense</a></li>
+                <li class="pure-menu-item"><a href="#addtransfer" class="pure-menu-link">Add Transfer</a></li>
                 <li class="pure-menu-item"><a href="#explore" class="pure-menu-link">Explore</a></li>
                 <li class="pure-menu-item"><a href="#view" class="pure-menu-link">View Expenses</a></li>
                 <li class="pure-menu-item"><a href="#account" class="pure-menu-link">Account</a></li>
@@ -77,12 +78,22 @@ console.log(e.event)
             <h1>Budget Bot</h1>
         </div>
 				<div class="content">
+          <h2 class="content-subhead"><a class='anchor' name='onthego'>Budget Bot on the Go</a></h2>
+          <div class="fb-send-to-messenger"
+						id="messenger-link"
+            messenger_app_id="264165663994086"
+  					page_id="274453546336424"
+            color="blue"
+            size="xlarge">
+          </div>
+				</div>
+				<div class="content">
             <h2 class="content-subhead"><a class='anchor' name='balances'>Balances</a></h2>
-						<div id="balances">Loading...</div>
+						<div id="balance-content">Loading...</div>
             <div id="warning1"></div>
 				</div>
 				<div class="content">
-            <h2 class="content-subhead"><a class='anchor' name='add-expense'>Add Expense</a></h2>
+            <h2 class="content-subhead"><a class='anchor' name='addexpense'>Add Expense</a></h2>
 						<div id="add-expense">
             <form class="pure-form-stacked" onsubmit="submit_expense(); return false;">
                 <fieldset>
@@ -93,6 +104,21 @@ console.log(e.event)
                 <button class="pure-button pure-button-primary">Submit</button>
                 </fieldset>
             </form>
+						<div id="add-expense-status"></div>
+            </div>
+				</div>
+				<div class="content">
+            <h2 class="content-subhead"><a class='anchor' name='addtransfer'>Add Transfer</a></h2>
+						<div id="add-transfer">
+            <form class="pure-form-stacked" onsubmit="submit_transfer(); return false;">
+                <fieldset>
+                <input id="transfer-amount" autocomplete="off" type="text" data-lpignore="true" placeholder="Amount">
+                <label for="account-source">From:</label><select id="account-source"></select>
+                <label for="account-dest">To:</label><select id="account-dest"></select>
+                <button class="pure-button pure-button-primary">Submit</button>
+                </fieldset>
+            </form>
+						<div id="add-transfer-status"></div>
             </div>
 				</div>
 				<div class="content">
@@ -110,13 +136,6 @@ console.log(e.event)
 				</div>
         <div class="content">
             <h2 class="content-subhead"><a class='anchor' name='account'>Account</a></h2>
-          <div class="fb-send-to-messenger"
-						id="messenger-link"
-            messenger_app_id="264165663994086"
-  					page_id="274453546336424"
-            color="blue"
-            size="xlarge">
-          </div>
           <p><a href="#" id="logoutBtn">Log out</a></p>
         </div>
     </div>

@@ -27,6 +27,7 @@ function parseDollarNum(num) {
   if(num.charAt(0)=="$") {
     num = num.substr(1);
   }
+	num = num.replace(/,/g,"");
   if(num.length == 0) {
     return NaN;
   }
@@ -307,7 +308,7 @@ function render_balance_response(raw_data) {
   state.last_account_change = raw_data.last_change;
   var data = raw_data.accounts;
 
-  var node = document.getElementById("balances");
+  var node = document.getElementById("balance-content");
   var cNode = node.cloneNode(false);
 
   if(data.length > 0) {
@@ -338,8 +339,12 @@ function render_balance_response(raw_data) {
       suggest += "Suggestion: Your balance in " + data[i][1] + " is negative, which may lead to high fees and/or interest. Consider paying this debt first before saving money in other accounts.<br>"
     }
   }
-  document.getElementById("warning1").innerHTML=suggest;
+  document.getElementById("warning1").innerText=suggest;
   var accountsel = document.getElementById("account-sel");
+  render_account_sel(accountsel, data);
+  accountsel = document.getElementById("account-source");
+  render_account_sel(accountsel, data);
+  accountsel = document.getElementById("account-dest");
   render_account_sel(accountsel, data);
 };
 
@@ -391,8 +396,8 @@ function format_date(time) {
   return timestr;
 }
 
-function sign(num) {
-  return num >=0 ? "" : "-";
+function sign(num, text) {
+  return num >=0 ? text : "("+text+")";
 }
 
 function format_dollars(amt) {
@@ -400,7 +405,7 @@ function format_dollars(amt) {
     return "(missing)";
   } else {
     var num = Number(amt);
-    return sign(num)+"$"+Math.abs(num).toFixed(2);
+    return sign(num, "$"+Math.abs(num).toFixed(2));
   }
 }
 function format_raw_dollars(amt) {
@@ -486,9 +491,13 @@ function render_expense(datai) {
 
   edit.addEventListener("click", function() {
     amt_edit.raw.value = format_raw_dollars(datai[1]["amount"]);
+		amt_edit.raw.placeholder = "Amount";
     cat_edit.raw.value = datai[1]["category_name"] || datai[1]["category"] || "";
+		cat_edit.raw.placeholder = "Category";
     acct_edit.raw.value = datai[1]["account"] || "";
+		acct_edit.raw.placeholder = "Account";
     desc_edit.raw.value = datai[1]["description"] || "";
+		desc_edit.raw.placeholder = "Description";
     $( cat_edit.raw ).autocomplete({"source": state.categories});
     amt_edit.className = "expense-edit expense-amt-edit";
     cat_edit.className = "expense-edit category-sel";
@@ -707,10 +716,17 @@ function submit_expense() {
   var data = auth();
   var desc = document.getElementById("description").value;
   data["description"]=desc;
-  var amt = document.getElementById("amount").value;
-  if(isNum(amt)) {
-    data["amount"] = amt;
-  }
+	var amt_el = document.getElementById("amount");
+  var amt = amt_el.value;
+	if(amt !== "") {
+		if(isDollarNum(amt)) {
+			data["amount"] = parseDollarNum(amt);
+		} else {
+			$(amt_el).addClass("error");
+			return;
+		}
+	}
+	$(amt_el).removeClass("error");
   var cat = document.getElementById("category").value;
   if(cat.length > 0) {
     data["category"]=cat;
@@ -720,15 +736,20 @@ function submit_expense() {
     data["account"]=document.getElementById("account-sel").value;
   }
   if(desc.length > 0 || amt.length > 0) {
+		var statusEl = document.getElementById("add-expense-status");
     function submit_expense_response(data) {
       if(data && data.error) {
         alert(data.error);
       }
       render();
       document.getElementById("description").value="";
-      document.getElementById("amount").value="";
+      amt_el.value="";
       document.getElementById("category").value="";
+			statusEl.innerText = "Submitted.";
+			$(statusEl).fadeOut();
     };
+		$(statusEl).show();
+		statusEl.innerText = "Submitting...";
     $.ajax({
         type: "POST",
         url: host+"/add",
@@ -743,6 +764,55 @@ function submit_expense() {
   }
 }
 
+function submit_transfer() {
+  var data = auth();
+  data["description"] = "Transfer";
+	var amt_el = document.getElementById("transfer-amount");
+  var amt = amt_el.value;
+	if(isDollarNum(amt)) {
+		data["amount"] = parseDollarNum(amt);
+	} else {
+		$(amt_el).addClass("error");
+		return;
+	}
+	$(amt_el).removeClass("error");
+  var cat = document.getElementById("account-dest").value;
+  if(cat && cat.length > 0) {
+    data["category"]=ACCT_PREFIX+cat;
+  } else {
+		return;
+	}
+  var acct = document.getElementById("account-source").value;
+  if(acct && acct.length > 0) {
+    data["account"]=document.getElementById("account-source").value;
+  } else {
+		return;
+	}
+	var statusEl = document.getElementById("add-transfer-status");
+	function submit_transfer_response(data) {
+		if(data && data.error) {
+			alert(data.error);
+		}
+		render();
+		amt_el.value="";
+		statusEl.innerText = "Submitted.";
+		$(statusEl).fadeOut();
+	};
+	$(statusEl).show();
+	statusEl.innerText = "Submitting...";
+	$.ajax({
+			type: "POST",
+			url: host+"/add",
+			data: data,
+			dataType: "json",
+			success: submit_transfer_response,
+			error: function(e) {
+				alert("Server error");
+				console.log(e);
+			}
+	});
+}
+
 function render() {
   render_balances(function(){
     render_add_expense();
@@ -753,7 +823,7 @@ function render() {
 function init() {
   setup();
   render();
-  setInterval(render, 20000);
+  setInterval(render, 10000);
 }
 
 function setup() {
