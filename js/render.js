@@ -474,10 +474,10 @@ function render_expense(datai) {
   outer.className = "expense-outer";
   line.className = "expense-line pure-g";
   desc_inner.innerText = description;
-  desc.className = "expense-description pure-u-lg-9-24 pure-u-20-24";
+  desc.className = "expense-description pure-u-lg-9-24 pure-u-18-24";
   amt_inner.innerText = amount;
   amt_inner.className="expense-amt-inner";
-  amt.className = "expense-amt pure-u-lg-3-24 pure-u-4-24";
+  amt.className = "expense-amt pure-u-lg-3-24 pure-u-6-24";
   cat_inner.innerText = category;
   cat.className = "expense-category pure-u-lg-5-24 pure-u-9-24";
   acct_inner.innerText = account;
