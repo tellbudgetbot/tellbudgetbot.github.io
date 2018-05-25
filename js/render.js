@@ -1,7 +1,7 @@
 var user=null;
 var token=null;
 var categoryPieChart = null;
-var host = "https://budget-bot.tk";
+var host = "https://api.tellbudgetbot.com";
 var ACCT_PREFIX="__acct:";
 
 var state = {
