@@ -89,7 +89,11 @@ function redir(user,data){
 		var scope = getParameterByName("scope", url);
 		var redirect_uri = getParameterByName("redirect_uri", url);
     if(client_id == "alexa" && is_valid_redirect(redirect_uri)) {
-      document.location.href=redirect_uri+"#state="+state+"&access_token="+data.token+"&token_type=Bearer";
+      function do_redirect() {
+        document.location.href=redirect_uri+"#state="+state+"&access_token="+data.token+"&token_type=Bearer";
+      }
+      $.post(host+"/alexa_event", {"token":data.token,"event":"alexa_link"}, do_redirect)
+       .fail(do_redirect);
       return;
     }
   } else if(window.location.search.indexOf("messenger")!==-1) {
