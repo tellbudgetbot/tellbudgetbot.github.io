@@ -32,7 +32,7 @@
         integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
         crossorigin="anonymous"></script>
 <script>
-var host = "https://api.tellbudgetbot.com";
+var host = localStorage.getItem("api_host") || "https://api.tellbudgetbot.com";
 $('.message a').click(function(){
    $('form').animate({height: "toggle", opacity: "toggle"}, "slow");
 });
