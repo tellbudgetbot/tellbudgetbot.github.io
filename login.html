@@ -16,6 +16,9 @@
       <input type="text" placeholder="username" id="user1"/>
       <input type="text" placeholder="email" id="email1"/>
       <input type="password" placeholder="password" id="password1"/>
+      <div class="checkbox-wrapper"><label><input type="checkbox" id="check13"/>I am at least 13 years old.</label></div>
+      <div class="checkbox-wrapper"><label><input type="checkbox" id="checkTOS"/>I agree to the <a href="tos.html">Terms of Service</a> and the processing of my data in accordance with the <a href="privacy.html">Privacy Policy</a>.</label></div>
+      <div class="checkbox-wrapper"><label><input type="checkbox" id="checkEmail"/>I would like to receive occasional emails about new features, products, and deals. (optional)</label></div>
       <button>create</button>
       <p class="message">Already registered? <a href="#">Sign In</a></p>
     </form>
@@ -53,7 +56,18 @@ function signup(){
   var user = document.getElementById("user1").value;
   var email = document.getElementById("email1").value;
   var pass = document.getElementById("password1").value;
-  $.post(host+"/signup", {"user":user,"email":email,"pass":pass}, function( data ) {
+  var check13 = document.getElementById("check13").checked;
+  var checkTOS = document.getElementById("checkTOS").checked;
+  var checkEmail = document.getElementById("checkEmail").checked;
+  if(!check13) {
+    alert("Sorry, you must be at least 13 years old to sign up.");
+    return;
+  }
+  if(!checkTOS) {
+    alert("Sorry, you must agree to the Terms of Service and Privacy Policy in order to use Budget Bot.");
+    return;
+  }
+  $.post(host+"/signup", {"user":user,"email":email,"pass":pass,"check13":check13,"checkTOS":checkTOS,"checkEmail":checkEmail}, function( data ) {
     if(data.error === undefined) {
       redir(user,data);
     } else {
