@@ -699,7 +699,7 @@ function render_expenses() {
   dt["last_change"] = state.last_expense_change;
   $.ajax({
       type: "POST",
-      url: host+"/view_30days",
+      url: host+"/view_all",
       data: dt,
       dataType: "json",
       success: render_expenses_response,
