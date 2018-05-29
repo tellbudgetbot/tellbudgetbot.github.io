@@ -28,6 +28,7 @@ function signup(){
   }
   if(user.length < 3) {
     alert("Sorry, your username must be at least 3 letters");
+    return;
   }
   if(!check13) {
     alert("Sorry, you must be at least 13 years old to sign up.");
