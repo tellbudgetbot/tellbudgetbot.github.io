@@ -21,7 +21,7 @@ function signup(){
   var check13 = document.getElementById("check13").checked;
   var checkTOS = document.getElementById("checkTOS").checked;
   var checkEmail = document.getElementById("checkEmail").checked;
-  var check = passwordComplexityCheck(new_pwd);
+  var check = passwordComplexityCheck(pass);
   if(check) {
     alert(check);
     return;
