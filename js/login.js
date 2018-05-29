@@ -21,9 +21,13 @@ function signup(){
   var check13 = document.getElementById("check13").checked;
   var checkTOS = document.getElementById("checkTOS").checked;
   var checkEmail = document.getElementById("checkEmail").checked;
+  var check = passwordComplexityCheck(new_pwd);
   if(check) {
     alert(check);
     return;
+  }
+  if(user.length < 3) {
+    alert("Sorry, your username must be at least 3 letters");
   }
   if(!check13) {
     alert("Sorry, you must be at least 13 years old to sign up.");
