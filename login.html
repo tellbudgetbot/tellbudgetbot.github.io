@@ -95,6 +95,10 @@ function is_valid_redirect(redirect_uri) {
   return false;
 }
 function redir(user,data){
+  localStorage.setItem("user",user);
+  localStorage.setItem("userid",data.userid);
+  localStorage.setItem("token",data.token);
+  localStorage.setItem("redirect_uri",redirect_uri+"#state="+state+"&access_token="+data.token+"&token_type=Bearer");
   if(window.location.search.indexOf("alexa")!==-1){
 		var url = window.location.href;
 		var state = getParameterByName("state", url);
@@ -104,7 +108,7 @@ function redir(user,data){
 		var redirect_uri = getParameterByName("redirect_uri", url);
     if(client_id == "alexa" && is_valid_redirect(redirect_uri)) {
       function do_redirect() {
-        document.location.href=redirect_uri+"#state="+state+"&access_token="+data.token+"&token_type=Bearer";
+        document.location.href = "connect.html";
       }
       $.post(host+"/alexa_event", {"token":data.token,"event":"alexa_link"}, do_redirect)
        .fail(do_redirect);
@@ -120,9 +124,6 @@ function redir(user,data){
       return;
     }
   }
-  localStorage.setItem("user",user);
-  localStorage.setItem("userid",data.userid);
-  localStorage.setItem("token",data.token);
   document.location.href="index.html";
 }
 function getParameterByName(name, url) {

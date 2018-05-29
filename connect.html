@@ -34,9 +34,9 @@
 </script>
 
 <div class="login-page">
-  <div class="form">
-    <form>
-    <p>Some text here</p>
+  <div class="form" onsubmit="redirect(); return false;">
+    <form class="left">
+    <p>To make budgeting as convenient as possible, you can also message Budget Bot in Facebook messenger! Click below to enable.</p>
     <div class="fb-send-to-messenger"
       id="messenger-link"
       messenger_app_id="399188853913433"
@@ -44,6 +44,8 @@
       color="blue"
       size="xlarge">
     </div>
+    <p>Then, click below to finish linking your Amazon account.</p>
+    <button>link alexa</button>
     </form>
   </div>
 </div>
@@ -51,6 +53,11 @@
 <script>
 var token = localStorage.getItem("token");
 document.getElementById("messenger-link").setAttribute("data-ref",token);
+
+function redirect() {
+  document.location.href = localStorage["redirect_uri"];
+}
+
 </script>
 
 </body>
