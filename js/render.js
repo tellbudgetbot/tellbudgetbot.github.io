@@ -1,7 +1,6 @@
 var user=null;
 var token=null;
 var categoryPieChart = null;
-var host = localStorage.getItem("api_host") || "https://api.tellbudgetbot.com";
 var ACCT_PREFIX="__acct:";
 
 var state = {

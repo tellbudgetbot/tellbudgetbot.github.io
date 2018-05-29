@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Budget Bot">
+    <link rel="stylesheet" type="text/css" href="css/login.css" />
+    <title>Budget Bot</title>
+</head>
+<body>
+
+<!-- source: https://codepen.io/colorlib/pen/rxddKy -->
+<div class="login-page">
+  <div class="form">
+    <form class="login-form" onsubmit="change_pwd(); return false;">
+      <p class="left">Old password:</p>
+      <input type="password" placeholder="old password" id="old_pwd"/>
+      <p class="left">New password:</p>
+      <input type="password" placeholder="new password" id="new_pwd"/>
+      <button>change</button>
+    </form>
+  </div>
+</div>
+<script
+        src="//code.jquery.com/jquery-3.3.1.min.js"
+        integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
+        crossorigin="anonymous"></script>
+<script src="js/util.js"></script>
+<script>
+var user;
+var token;
+function change_pwd() {
+  var old_pwd = document.getElementById("old_pwd").value;
+  var new_pwd = document.getElementById("new_pwd").value;
+  var check = passwordComplexityCheck(new_pwd);
+  if(check) {
+    alert(check);
+    return;
+  }
+  $.post(host+"/change_password", {"token":token,"old_pass":old_pwd,"new_pass":new_pwd}, function( data ) {
+    if(data.error === undefined ) {
+      alert("Password updated.");
+      document.location.href="index.html";
+    } else {
+      alert(data.error);
+    }
+  },"json").fail(function() {
+    alert("Sorry, an error occurred.");
+  });
+
+}
+function preinit() {
+  user = localStorage.getItem("user");
+  token = localStorage.getItem("token");
+  if(user === null || token == null) {
+    document.location.href = "login.html";
+  }
+}
+preinit();
+</script>
+</body>
+</html>
