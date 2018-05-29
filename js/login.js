@@ -21,17 +21,16 @@ function signup(){
   var check13 = document.getElementById("check13").checked;
   var checkTOS = document.getElementById("checkTOS").checked;
   var checkEmail = document.getElementById("checkEmail").checked;
+  if(check) {
+    alert(check);
+    return;
+  }
   if(!check13) {
     alert("Sorry, you must be at least 13 years old to sign up.");
     return;
   }
   if(!checkTOS) {
     alert("Sorry, you must agree to the Terms of Service and Privacy Policy in order to use Budget Bot.");
-    return;
-  }
-  var check = passwordComplexityCheck(pass);
-  if(check) {
-    alert(check);
     return;
   }
   $.post(host+"/signup", {"user":user,"email":email,"pass":pass,"check13":check13,"checkTOS":checkTOS,"checkEmail":checkEmail}, function( data ) {
@@ -62,6 +61,9 @@ function is_valid_redirect(redirect_uri) {
   return false;
 }
 function redir(user,data){
+  localStorage.setItem("user",user);
+  localStorage.setItem("userid",data.userid);
+  localStorage.setItem("token",data.token);
   if(window.location.search.indexOf("alexa")!==-1){
 		var url = window.location.href;
 		var state = getParameterByName("state", url);
@@ -70,8 +72,10 @@ function redir(user,data){
 		var scope = getParameterByName("scope", url);
 		var redirect_uri = getParameterByName("redirect_uri", url);
     if(client_id == "alexa" && is_valid_redirect(redirect_uri)) {
+      var uri = redirect_uri+"#state="+state+"&access_token="+data.token+"&token_type=Bearer";
+      localStorage.setItem("redirect_uri", uri);
       function do_redirect() {
-        document.location.href=redirect_uri+"#state="+state+"&access_token="+data.token+"&token_type=Bearer";
+        document.location.href = "connect.html";
       }
       $.post(host+"/alexa_event", {"token":data.token,"event":"alexa_link"}, do_redirect)
        .fail(do_redirect);
@@ -87,9 +91,6 @@ function redir(user,data){
       return;
     }
   }
-  localStorage.setItem("user",user);
-  localStorage.setItem("userid",data.userid);
-  localStorage.setItem("token",data.token);
   document.location.href="index.html";
 }
 function getParameterByName(name, url) {
