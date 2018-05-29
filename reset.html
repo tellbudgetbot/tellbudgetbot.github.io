@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Budget Bot">
+    <link rel="stylesheet" type="text/css" href="css/login.css" />
+    <title>Budget Bot</title>
+    <script src='https://www.google.com/recaptcha/api.js'></script>
+</head>
+<body>
+
+<div class="login-page">
+  <div class="form" onsubmit="reset_pwd(); return false;">
+    <form class="left">
+    <p>Enter your new password</p>
+    <input type="password" placeholder="enter password" id="pass1"/>
+    <input type="password" placeholder="repeat password" id="pass2"/>
+      <button>submit</button>
+    </form>
+  </div>
+</div>
+<script
+        src="//code.jquery.com/jquery-3.3.1.min.js"
+        integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
+        crossorigin="anonymous"></script>
+<script src="js/util.js"></script>
+<script>
+function reset_pwd() {
+  var pass1 = document.getElementById("pass1").value;
+  var pass2 = document.getElementById("pass2").value;
+  if(pass1!==pass2) {
+    alert("Passwords do not match. Please enter the same password twice.");
+    return;
+  }
+  var check = passwordComplexityCheck(pass1);
+  if(check) {
+    alert(check);
+    return;
+  }
+  var token = document.location.search.substr(1);
+  $.post(host+"/reset_password", {"reset_token":token,"password":pass1}, function( data ) {
+    if(data.error === undefined ) {
+      alert("Password updated. Please log in.");
+      document.location.href="login.html";
+    } else {
+      alert(data.error);
+    }
+  },"json").fail(function() {
+    alert("Sorry, an error occurred.");
+  });
+}
+</script>
+</body>
+</html>

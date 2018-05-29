@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Budget Bot">
+    <link rel="stylesheet" type="text/css" href="css/login.css" />
+    <title>Budget Bot</title>
+    <script src='https://www.google.com/recaptcha/api.js'></script>
+</head>
+<body>
+
+<div class="login-page">
+  <div class="form" onsubmit="forgot_pwd(); return false;">
+    <form class="left">
+    <p>Forgot your password? Enter the username and email below. If they match, we'll send a password reset link to the email associated with the account.</p>
+    <input type="text" placeholder="username" id="user"/>
+    <input type="text" placeholder="email" id="email"/>
+    <div class="g-recaptcha" data-sitekey="6LeGKFwUAAAAAP4dq0tPgmQbQnIdJsYsSbG0pIc3"></div>
+      <button>submit</button>
+      <p class="message">Remembered your password? <a href="login.html">Back to login</a></p>
+    </form>
+  </div>
+</div>
+<script
+        src="//code.jquery.com/jquery-3.3.1.min.js"
+        integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
+        crossorigin="anonymous"></script>
+<script src="js/util.js"></script>
+<script>
+function forgot_pwd() {
+  try {
+    var user = document.getElementById("user").value;
+    var email = document.getElementById("email").value;
+    var captcha = document.getElementsByName("g-recaptcha-response")[0].value;
+    $.post(host+"/forgot", {"user":user,"email":email,"g-recaptcha-response":captcha}, function( data ) {
+      if(data.error === undefined ) {
+        alert("If the information matched our records, a reset email has been sent.");
+        document.location.href="login.html";
+      } else {
+        alert(data.error);
+        document.location.href="forgot.html";
+      }
+    },"json").fail(function(xhr,status,e) {
+      console.log(e);
+      alert("Sorry, a server error occurred.");
+    });
+  }
+  catch(e) {
+    console.log(e);
+    alert("Sorry, an error occurred.");
+  }
+}
+</script>
+</body>
+</html>
