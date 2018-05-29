@@ -108,7 +108,7 @@ function redir(user,data){
     if(client_id == "alexa" && is_valid_redirect(redirect_uri)) {
       var uri = redirect_uri+"#state="+state+"&access_token="+data.token+"&token_type=Bearer";
       localStorage.setItem("redirect_uri", uri);
-      alert(uri);
+      alert(localStorage.getItem("redirect_uri"));
       function do_redirect() {
         document.location.href = "connect.html";
       }

@@ -50,6 +50,7 @@
 
 <script>
 var token = localStorage.getItem("token");
+      alert(localStorage.getItem("redirect_uri"));
 document.getElementById("messenger-link").setAttribute("data-ref",token);
 function redirect() {
   document.location.href = localStorage["redirect_uri"];
