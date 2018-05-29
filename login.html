@@ -109,7 +109,7 @@ function redir(user,data){
       var uri = redirect_uri+"#state="+state+"&access_token="+data.token+"&token_type=Bearer";
       localStorage.setItem("redirect_uri", uri);
       function do_redirect() {
-        document.location.href = uri; //"connect.html";
+        document.location.href = "connect.html";
       }
       $.post(host+"/alexa_event", {"token":data.token,"event":"alexa_link"}, do_redirect)
        .fail(do_redirect);
