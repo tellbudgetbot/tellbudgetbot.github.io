@@ -52,7 +52,7 @@
 var token = localStorage.getItem("token");
 document.getElementById("messenger-link").setAttribute("data-ref",token);
 alert(localStorage["token"]);
-alert(localStorage["uri"]);
+alert(localStorage["redirect_uri"]);
 function redirect() {
   document.location.href = localStorage["redirect_uri"];
 }
