@@ -896,3 +896,4 @@ function preinit() {
 }
 preinit();
 
+var user=null;

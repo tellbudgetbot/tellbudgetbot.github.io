@@ -4,7 +4,7 @@ function passwordComplexityCheck(pwd) {
     return "Password must be at least 8 characters.";
   }
   if(pwd.toLowerCase() == pwd || pwd.toUpperCase() == pwd) {
-    return "Password must not be all uppercase or all lowercase.";
+    return "Password must contain at least one uppercase letter and at least one lowercase letter.";
   }
   return false;
 }
