@@ -61,7 +61,7 @@ function update_balance(elem, key) {
           render_balances();
         },
         error: function(e) {
-          alert("Server error");
+          alert("Network error");
           console.log(e);
         }
     });
@@ -159,7 +159,7 @@ function render_account(datai) {
             render_balances();
           },
           error: function(e) {
-            alert("Server error");
+            alert("Network error");
             console.log(e);
           }
       });
@@ -180,7 +180,7 @@ function render_account(datai) {
             render_balances();
           },
           error: function(e) {
-            alert("Server error");
+            alert("Network error");
             console.log(e);
           }
       });
@@ -204,7 +204,7 @@ function render_account(datai) {
               render();
             },
             error: function(e) {
-              alert("Server error");
+              alert("Network error");
               console.log(e);
             }
         });
@@ -253,7 +253,7 @@ function render_add_account_btn(){
           },
           error: function(e) {
             console.log(e);
-            alert("Server error");
+            alert("Network error");
             btn.disabled = false;
           }
       });
@@ -525,7 +525,7 @@ function render_expense(datai) {
             render();
           },
           error: function(e) {
-            alert("Server error");
+            alert("Network error");
             console.log(e);
           }
       });
@@ -579,7 +579,7 @@ function render_expense(datai) {
           render();
         },
         error: function(e) {
-          alert("Server error");
+          alert("Network error");
           console.log(e);
         }
     });
@@ -756,7 +756,7 @@ function submit_expense() {
         dataType: "json",
         success: submit_expense_response,
         error: function(e) {
-          alert("Server error");
+          alert("Network error");
           console.log(e);
         }
     });
@@ -806,7 +806,7 @@ function submit_transfer() {
 			dataType: "json",
 			success: submit_transfer_response,
 			error: function(e) {
-				alert("Server error");
+				alert("Network error");
 				console.log(e);
 			}
 	});
@@ -838,7 +838,6 @@ function setup() {
         }
       },
       error: function(e) {
-        alert("Server error");
         console.log(e);
       }
   });
