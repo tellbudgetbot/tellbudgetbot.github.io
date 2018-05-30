@@ -2,13 +2,16 @@ var user=null;
 var token=null;
 var categoryPieChart = null;
 var ACCT_PREFIX="__acct:";
+var MONTH_NAMES = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
 
 var state = {
   "last_account_change": "(unknown)",
   "last_expense_change": "(unknown)",
   "last_category_change": "(unknown)",
+  "last_pie_change": "(unknown)",
   "accounts": [],
-  "categories": []
+  "categories": [],
+  "userinfo": null
 };
 
 function auth(){
@@ -42,34 +45,6 @@ function starts_with(str,pref){
   return str.length >= pref.length && str.substr(0,pref.length) == pref;
 }
 
-
-function update_balance(elem, key) {
-  var balance = prompt("Enter new balance");
-  if(isDollarNum(balance)) {
-    var data = auth();
-    data["account"] = key;
-    data["balance"] = parseDollarNum(balance);
-    $.ajax({
-        type: "POST",
-        url: host+"/set_balance",
-        data: data,
-        dataType: "json",
-        success: function(data) {
-          if(data && data.error) {
-            alert(data.error);
-          }
-          render_balances();
-        },
-        error: function(e) {
-          alert("Network error");
-          console.log(e);
-        }
-    });
-  } else {
-    alert("Not a number");
-  }
-
-}
 function render_account_heading() {
   var thead = document.createElement("thead");
   var tr = document.createElement("tr");
@@ -158,7 +133,7 @@ function render_account(datai) {
             }
             render_balances();
           },
-          error: function(e) {
+          error: function(r,s,e) {
             alert("Network error");
             console.log(e);
           }
@@ -179,7 +154,7 @@ function render_account(datai) {
             }
             render_balances();
           },
-          error: function(e) {
+          error: function(r,s,e) {
             alert("Network error");
             console.log(e);
           }
@@ -203,7 +178,7 @@ function render_account(datai) {
               }
               render();
             },
-            error: function(e) {
+            error: function(r,s,e) {
               alert("Network error");
               console.log(e);
             }
@@ -251,7 +226,7 @@ function render_add_account_btn(){
               render();
             }
           },
-          error: function(e) {
+          error: function(r,s,e) {
             console.log(e);
             alert("Network error");
             btn.disabled = false;
@@ -361,7 +336,7 @@ function render_balances(callback) {
           callback(data);
         }
       },
-      error: function(e) {
+      error: function(r,s,e) {
         console.log(e);
       }
   });
@@ -524,7 +499,7 @@ function render_expense(datai) {
             }
             render();
           },
-          error: function(e) {
+          error: function(r,s,e) {
             alert("Network error");
             console.log(e);
           }
@@ -578,7 +553,7 @@ function render_expense(datai) {
           }
           render();
         },
-        error: function(e) {
+        error: function(r,s,e) {
           alert("Network error");
           console.log(e);
         }
@@ -621,7 +596,110 @@ function dateFromTimestamp(tstmp) {
   return new Date(tstmp*1000);
 }
 
-function render_expenses() {
+function render_month_selector(sel, extra_lasts) {
+  if(state.userinfo === null) {
+    console.log("Error: no user info");
+    return;
+  }
+  var create_time = state.userinfo.create_time;
+  var create_date = new Date(create_time * 1000);
+  var now = new Date();
+  var cNode = null;
+  var val = null;
+  cNode = sel.cloneNode(false);
+  val = sel.value;
+
+  var lasts = [7,30];
+  if(extra_lasts) {
+    for(var i = 0; i < extra_lasts.length; i++) {
+      lasts.push(extra_lasts[i]);
+    }
+  }
+  for(var i = 0; i < lasts.length; i++) {
+    var option = document.createElement("option");
+    option.value = "LAST"+lasts[i];
+    option.innerText = "Last " + lasts[i] + " days";
+    cNode.appendChild(option);
+  }
+
+  var createMonth = create_date.getMonth();
+  var createYear = create_date.getFullYear();
+  var month = now.getMonth();
+  var year = now.getFullYear();
+  while(year > createYear || (year == createYear && month >= createMonth)) {
+    var option = document.createElement("option");
+    option.value = year+"-"+month;
+    option.innerText = MONTH_NAMES[month] + " " + year;
+    cNode.appendChild(option);
+
+    month--;
+    if(month < 0) {
+      month += 12;
+      year--;
+    }
+  }
+  cNode.value = val;
+  sel.parentNode.replaceChild(cNode, sel);
+  return cNode;
+}
+function render_pie() {
+  function render_pie_response(raw_data) {
+    if(raw_data.cached) {
+      return;
+    }
+    state.last_pie_change = raw_data.last_change;
+    var data = raw_data.items;
+    var cat_sums = {};
+    var cats = [];
+    for(var i = 0; i < data.length; i++) {
+      if(isNum(data[i][1]["amount"])) {
+        var cat = data[i][1]["category"];
+        if(!cat) {
+          cat = "Uncategorized";
+        }
+        var amt = Number(data[i][1]["amount"]);
+        if(cat_sums[cat] === null || cat_sums[cat] === undefined) {
+          cat_sums[cat]=0.0;
+          cats.push(cat);
+        }
+        cat_sums[cat]+=amt;
+      }
+    }
+    cats.sort(function(a,b) {
+      return cat_sums[b] - cat_sums[a];
+    });
+    if(get_cat(cat_sums,"Entertainment") > get_cat(cat_sums,"Groceries") + get_cat(cat_sums,"Eating out")) {
+      document.getElementById("warnings").innerText = "Suggestion: Your spending on entertainment exceeds your spending on food. To save money, consider reducing entertainment expenses.";
+    } else {
+      document.getElementById("warnings").innerText = "";
+    }
+    if(categoryPieChart) {
+      if(cats.length > 0) {
+        $("#pieChartContainer").show();
+        categoryPieChart.data.labels.length = 0;
+        categoryPieChart.data.datasets[0].data.length = 0;
+        for(var i = 0; i < cats.length; i++) {
+          if(cat_sums[cats[i]] > 0 && !starts_with(cats[i],ACCT_PREFIX)) {
+            categoryPieChart.data.labels.push(cats[i]);
+            categoryPieChart.data.datasets[0].data.push(cat_sums[cats[i]].toFixed(2));
+          }
+        }
+        categoryPieChart.update();
+        document.getElementById("welcome-explore").innerText = "";
+      } else {
+        $("#pieChartContainer").hide();
+        document.getElementById("welcome-explore").innerText = "Welcome to Budget Bot! At the moment, there are no expenses for the time period selected, but once you enter in some expenses, you'll be able to visualize your spending here.";
+      }
+    }
+  }
+  var dt = auth();
+  dt["last_change"] = state.last_pie_change;
+
+  var sel = document.getElementById("pie-month-sel");
+  get_expenses(dt, sel, render_pie_response);
+}
+
+function render_expenses(callback) {
   function render_expenses_response(raw_data) {
     if(raw_data.cached) {
       return;
@@ -650,63 +728,45 @@ function render_expenses() {
       }
       node.parentNode.replaceChild(cNode ,node);
     } else {
-        document.getElementById("welcome-expenses").innerText = "Once you enter in some expenses, they'll appear here.";
-
+      document.getElementById("expenses").innerText = "";
+      document.getElementById("welcome-expenses").innerText = "There aren't any expenses for the time period selected.";
     }
-
-    var cat_sums = {};
-    var cats = [];
-    for(var i = 0; i < data.length; i++) {
-      if(isNum(data[i][1]["amount"])) {
-        var cat = data[i][1]["category"];
-        if(!cat) {
-          cat = "Uncategorized";
-        }
-        var amt = Number(data[i][1]["amount"]);
-        if(cat_sums[cat] === null || cat_sums[cat] === undefined) {
-          cat_sums[cat]=0.0;
-          cats.push(cat);
-        }
-        cat_sums[cat]+=amt;
-      }
-    }
-    if(get_cat(cat_sums,"Entertainment") > get_cat(cat_sums,"Groceries") + get_cat(cat_sums,"Eating out")) {
-      document.getElementById("warnings").innerText = "Suggestion: Your spending on entertainment exceeds your spending on food. To save money, consider reducing entertainment expenses.";
-    } else {
-      document.getElementById("warnings").innerText = "";
-    }
-    if(categoryPieChart) {
-      if(cats.length > 0) {
-        $("#pieChartContainer").show();
-        categoryPieChart.data.labels.length = 0;
-        categoryPieChart.data.datasets[0].data.length = 0;
-        for(var i = 0; i < cats.length; i++) {
-          if(cat_sums[cats[i]] > 0 && !starts_with(cats[i],ACCT_PREFIX)) {
-            categoryPieChart.data.labels.push(cats[i]);
-            categoryPieChart.data.datasets[0].data.push(cat_sums[cats[i]].toFixed(2));
-          }
-        }
-        categoryPieChart.update();
-        document.getElementById("welcome-explore").innerText = "";
-      } else {
-        $("#pieChartContainer").hide();
-        document.getElementById("welcome-explore").innerText = "Welcome to Budget Bot! Once you enter in some expenses, you'll be able to visualize your spending here.";
-      }
+    document.getElementById("expenses").style.opacity=1;
+    if(callback) {
+      callback();
     }
   }
   var dt = auth();
   dt["last_change"] = state.last_expense_change;
+
+  var sel = document.getElementById("expenses-month-sel");
+  get_expenses(dt, sel, render_expenses_response);
+}
+
+function get_expenses(dt, selector, callback) {
+  if(selector.value.substr(0,4) == "LAST") {
+    dt["duration"] = Number(selector.value.substr(4))*3600*24;
+  } else {
+    var parts = selector.value.split("-");
+    var year = Number(parts[0]);
+    var month = Number(parts[1]);
+    var start = new Date(year, month, 1);
+    var end = new Date(year, month+1, 1);
+    dt["start_time"] = start.getTime() / 1000;
+    dt["end_time"] = end.getTime() / 1000;
+  }
   $.ajax({
       type: "POST",
-      url: host+"/view_all",
+      url: host+"/view_recent",
       data: dt,
       dataType: "json",
-      success: render_expenses_response,
-      error: function(e) {
+      success: callback,
+      error: function(r,s,e) {
         console.log(e);
       }
   });
 }
+
 function get_cat(cat_sums, cat){
   return cat_sums[cat] || 0.0;
 }
@@ -755,7 +815,7 @@ function submit_expense() {
         data: data,
         dataType: "json",
         success: submit_expense_response,
-        error: function(e) {
+        error: function(r,s,e) {
           alert("Network error");
           console.log(e);
         }
@@ -805,17 +865,34 @@ function submit_transfer() {
 			data: data,
 			dataType: "json",
 			success: submit_transfer_response,
-			error: function(e) {
+			error: function(r,s,e) {
 				alert("Network error");
 				console.log(e);
 			}
 	});
 }
 
+function expense_month_selector_changed() {
+  state.last_expense_change = "(unknown)";
+  document.getElementById("expenses").style.opacity=0.5;
+  render_expenses(function() {
+    setTimeout(function() {
+      document.location.href = "#view";
+    },50);
+  });
+  document.location.href = "#view";
+}
+
+function pie_month_selector_changed() {
+  state.last_pie_change = "(unknown)";
+  render_pie();
+}
+
 function render() {
   render_balances(function(){
     render_add_expense();
     render_expenses();
+    render_pie();
   });
 }
 
@@ -828,16 +905,25 @@ function init() {
 function setup() {
   $.ajax({
       type: "POST",
-      url: host+"/userid",
+      url: host+"/userinfo",
       data: auth(),
       dataType: "json",
       success: function(data) {
         if(data.error!==undefined) {
           console.log(data.error);
           logout();
+        } else {
+          state.userinfo = data;
+          var emonsel = document.getElementById("expenses-month-sel");
+          emonsel = render_month_selector(emonsel);
+          emonsel.onchange = expense_month_selector_changed;
+
+          var pmonsel = document.getElementById("pie-month-sel");
+          pmonsel = render_month_selector(pmonsel, [60,90,365]);
+          pmonsel.onchange = pie_month_selector_changed;
         }
       },
-      error: function(e) {
+      error: function(r,s,e) {
         console.log(e);
       }
   });
