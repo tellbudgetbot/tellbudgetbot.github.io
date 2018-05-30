@@ -4,6 +4,9 @@ a.anchor {
 p {
   color: #555;
 }
+p.tall {
+  line-height:2.4em;
+}
 a[href]:visited, a[href] {
   color: #00A;
 }
