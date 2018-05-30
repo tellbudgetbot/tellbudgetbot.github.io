@@ -683,7 +683,7 @@ function render_expenses() {
         for(var i = 0; i < cats.length; i++) {
           if(cat_sums[cats[i]] > 0 && !starts_with(cats[i],ACCT_PREFIX)) {
             categoryPieChart.data.labels.push(cats[i]);
-            categoryPieChart.data.datasets[0].data.push(cat_sums[cats[i]]);
+            categoryPieChart.data.datasets[0].data.push(cat_sums[cats[i]].toFixed(2));
           }
         }
         categoryPieChart.update();
