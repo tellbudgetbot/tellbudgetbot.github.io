@@ -28,14 +28,16 @@
 <script>
   window.fbAsyncInit = function() {
     FB.init({
-      appId            : '264165663994086',
+      appId            : '399188853913433',
+      //appId            : '264165663994086',
       autoLogAppEvents : true,
       xfbml            : true,
       version          : 'v2.12'
     });
 		FB.Event.subscribe('send_to_messenger', function(e) {
 			if(e.event === "clicked") {
-				window.open("https://m.me/budgetbotchat","_blank");
+			  window.open("https://m.me/205308756748960","_blank");
+      	//window.open("https://m.me/budgetbotchat","_blank");
 			}
 		});
   };
@@ -80,10 +82,12 @@
 				<div class="content">
           <h2 class="content-subhead"><a class='anchor' name='onthego'>Budget Bot on the Go</a></h2>
           <p>You can easily record your expenses just by talking to Budget Bot on Messenger. Click below to get started.</p>
+            <!--messenger_app_id="264165663994086"
+  					page_id="274453546336424"-->
           <div class="fb-send-to-messenger"
 						id="messenger-link"
-            messenger_app_id="264165663994086"
-  					page_id="274453546336424"
+            messenger_app_id="399188853913433"
+            page_id="205308756748960"
             color="blue"
             size="xlarge">
           </div>
