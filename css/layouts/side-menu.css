@@ -1,7 +1,8 @@
 /* modified from https://purecss.io/layouts/side-menu/ */
 
 body {
-    color: #777;
+    color: #555;
+    font-family: "Bitstream Vera Sans", "Roman", sans-serif;
 }
 
 .pure-img-responsive {
