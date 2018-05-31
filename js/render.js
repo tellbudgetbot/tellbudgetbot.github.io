@@ -420,9 +420,9 @@ function make_account_sel() {
 function render_expense(datai) {
   var time = dateFromTimestamp(datai[1]["timestamp"]);
   var timestr = format_date(time);
-  var description = datai[1]["description"] || "(missing description)";
+  var description = datai[1]["description"] || "(no description)";
   var category = datai[1]["category_name"] || datai[1]["category"] || "(uncategorized)";
-  var account = datai[1]["account_name"] || "(missing account)";
+  var account = datai[1]["account_name"] || "(no account)";
   var amount = format_dollars(datai[1]["amount"]);
   var outer = document.createElement("div");
   var line = document.createElement("div");
@@ -678,14 +678,31 @@ function render_pie() {
         $("#pieChartContainer").show();
         categoryPieChart.data.labels.length = 0;
         categoryPieChart.data.datasets[0].data.length = 0;
+        var incomes = [];
+        var total_income = 0
+        var total_expenses = 0;
+        var only_income_cat = true;
         for(var i = 0; i < cats.length; i++) {
           if(cat_sums[cats[i]] > 0 && !starts_with(cats[i],ACCT_PREFIX)) {
             categoryPieChart.data.labels.push(cats[i]);
             categoryPieChart.data.datasets[0].data.push(cat_sums[cats[i]].toFixed(2));
+            total_expenses += cat_sums[cats[i]];
+          } else if(cat_sums[cats[i]] < 0) {
+            incomes.push(cats[i] + ": " + format_dollars(-cat_sums[cats[i]]));
+            total_income -= cat_sums[cats[i]];
+            if(cats[i] !== "Income") {
+              only_income_cat = false;
+            }
           }
         }
         categoryPieChart.update();
-        document.getElementById("welcome-explore").innerText = "";
+        var income_cats = "";
+        if(incomes.length > 1) {
+          income_cats = "Your income can be divided into categories as follows: " + incomes.join(",");
+        } else {
+          income_cats = "";
+        }
+        document.getElementById("welcome-explore").innerText = "During this period your income totalled " + format_dollars(total_income) + " and your expenses totalled " + format_dollars(total_expenses) + "." + income_cats;
       } else {
         $("#pieChartContainer").hide();
         document.getElementById("welcome-explore").innerText = "Welcome to Budget Bot! At the moment, there are no expenses for the time period selected, but once you enter in some expenses, you'll be able to visualize your spending here.";
@@ -794,6 +811,13 @@ function submit_expense() {
   if(acct && acct.length > 0) {
     data["account"]=document.getElementById("account-sel").value;
   }
+  var date = $("#submit-date").datepicker( "getDate" );
+  if(date) {
+    //TODO: timezone problems
+    var noon = new Date(date.getFullYear(), date.getMonth(), date.getDate(), 12);
+    data["timestamp"] = noon.getTime() / 1000;
+    data["timezone"] = noon.getTimezoneOffset();
+  }
   if(desc.length > 0 || amt.length > 0) {
 		var statusEl = document.getElementById("add-expense-status");
     function submit_expense_response(data) {
@@ -804,6 +828,7 @@ function submit_expense() {
       document.getElementById("description").value="";
       amt_el.value="";
       document.getElementById("category").value="";
+      $.datepicker._clearDate($("#submit-date"));
 			statusEl.innerText = "Submitted.";
 			$(statusEl).fadeOut();
     };
@@ -847,6 +872,13 @@ function submit_transfer() {
   } else {
 		return;
 	}
+  var date = $("#submit-transfer").datepicker( "getDate" );
+  if(date) {
+    //TODO: timezone problems
+    var noon = new Date(date.getFullYear(), date.getMonth(), date.getDate(), 12);
+    data["timestamp"] = noon.getTime() / 1000;
+    data["timezone"] = noon.getTimezoneOffset();
+  }
 	var statusEl = document.getElementById("add-transfer-status");
 	function submit_transfer_response(data) {
 		if(data && data.error) {
@@ -928,6 +960,10 @@ function setup() {
       }
   });
   document.getElementById("logoutBtn").onclick = logout;
+
+  $( function() {
+    $( ".datepicker" ).datepicker();
+  } );
 
   try {
     var ctx = document.getElementById("pieChart").getContext('2d');

@@ -109,10 +109,11 @@
 						<div id="add-expense">
             <form class="pure-form-stacked" onsubmit="submit_expense(); return false;">
                 <fieldset>
-                <input id="description" autocomplete="off" type="text" data-lpignore="true" placeholder="Description">
-                <input id="amount" autocomplete="off" type="text" data-lpignore="true" placeholder="Amount">
-                <input id="category" autocomplete="off" class="category-sel" data-lpignore="true" type="text" placeholder="Category">
+                <input id="description" autocomplete="off" type="text" data-lpignore="true" placeholder="Description"/>
+                <input id="amount" autocomplete="off" type="text" data-lpignore="true" placeholder="Amount"/>
+                <input id="category" autocomplete="off" class="category-sel" data-lpignore="true" type="text" placeholder="Category"/>
                 <select id="account-sel"></select>
+                <input id="submit-date" data-lpignore="true" type="text" class="datepicker" autocomplete="off" placeholder="Date (default today)"/>
                 <button class="pure-button pure-button-primary">Submit</button>
                 </fieldset>
             </form>
@@ -124,9 +125,10 @@
 						<div id="add-transfer">
             <form class="pure-form-stacked" onsubmit="submit_transfer(); return false;">
                 <fieldset>
-                <input id="transfer-amount" autocomplete="off" type="text" data-lpignore="true" placeholder="Amount">
+                <input id="transfer-amount" autocomplete="off" type="text" data-lpignore="true" placeholder="Amount"/>
                 <label for="account-source">From:</label><select id="account-source"></select>
                 <label for="account-dest">To:</label><select id="account-dest"></select>
+                <input id="transfer-date" data-lpignore="true" type="text" class="datepicker" autocomplete="off" placeholder="Date (default today)"/>
                 <button class="pure-button pure-button-primary">Submit</button>
                 </fieldset>
             </form>
@@ -163,12 +165,12 @@
 </div>
 
 <script
-        src="//code.jquery.com/jquery-3.3.1.min.js"
+        src="https://code.jquery.com/jquery-3.3.1.min.js"
         integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
         crossorigin="anonymous"></script>
-<script src="//code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
-<link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
-<script src="//www.chartjs.org/dist/2.7.1/Chart.bundle.js"></script>
+<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+<link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+<script src="https://www.chartjs.org/dist/2.7.1/Chart.bundle.js"></script>
 
 <script src="js/util.js"></script>
 <script src="js/ui.js"></script>
