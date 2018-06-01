@@ -1,6 +1,17 @@
 $('.switcher a').click(function(){
    $('form').animate({height: "toggle", opacity: "toggle"}, "slow");
 });
+function preinit() {
+  if(document.location.hash.indexOf("signup")!==-1) {
+    $('form').animate({height: "toggle", opacity: "toggle"}, 50);
+  }
+}
+function showVideo() {
+  var outer = document.getElementById("outerVideo");
+  outer.className += " visible";
+  var video = document.getElementById("video");
+  video.src += "&autoplay=1";
+}
 function login(){
   var user = document.getElementById("user2").value;
   var pass = document.getElementById("password2").value;
@@ -107,3 +118,4 @@ function getParameterByName(name, url) {
     if (!results[2]) return '';
     return decodeURIComponent(results[2].replace(/\+/g, " "));
 }
+preinit();
