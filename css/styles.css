@@ -197,5 +197,7 @@ a.no-link.pure-button {
 }
 
 .phone-screenshot {
-  max-width: 400px;
+  max-width: 350px;
+  margin-top:10px;
+  margin-bottom;10px;
 }
