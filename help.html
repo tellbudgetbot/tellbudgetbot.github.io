@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Budget Bot">
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+    <link rel="manifest" href="/site.webmanifest">
+    <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+    <meta name="msapplication-TileColor" content="#da532c">
+    <meta name="theme-color" content="#ffffff">
+    <title>Budget Bot</title>
+
+    <link rel="stylesheet" href="css/pure-min.css">
+    <!--[if lte IE 8]>
+        <link rel="stylesheet" href="css/layouts/side-menu-old-ie.css">
+    <![endif]-->
+    <!--[if gt IE 8]><!-->
+        <link rel="stylesheet" href="css/layouts/side-menu.css">
+    <!--<![endif]-->
+    <!--[if lte IE 8]>
+        <link rel="stylesheet" href="https://unpkg.com/purecss@1.0.0/build/grids-responsive-old-ie-min.css">
+    <![endif]-->
+    <!--[if gt IE 8]><!-->
+        <link rel="stylesheet" href="https://unpkg.com/purecss@1.0.0/build/grids-responsive-min.css">
+    <!--<![endif]-->
+    <link rel="stylesheet" type="text/css" href="css/styles.css" />
+    <script defer src="https://use.fontawesome.com/releases/v5.0.8/js/all.js"></script>
+</head>
+<body>
+
+<div id="layout">
+    <!-- Menu toggle -->
+    <a href="#menu" id="menuLink" class="menu-link">
+        <!-- Hamburger icon -->
+        <span></span>
+    </a>
+
+    <div id="menu">
+        <div class="pure-menu">
+            <a class="pure-menu-heading" href="#top">Budget Bot</a>
+
+            <ul class="pure-menu-list">
+                <li class="pure-menu-item"><a href="#onthego" class="pure-menu-link">On the Go</a></li>
+                <li class="pure-menu-item"><a href="#messenger" class="pure-menu-link">Messenger</a></li>
+                <li class="pure-menu-item"><a href="#messenger" class="pure-menu-link">Alexa</a></li>
+                <li class="pure-menu-item"><a href="#categories" class="pure-menu-link">Categories</a></li>
+                <li class="pure-menu-item"><a href="#balances" class="pure-menu-link">Balances</a></li>
+                <li class="pure-menu-item"><a href="#other" class="pure-menu-link">Other</a></li>
+            </ul>
+        </div>
+    </div>
+    <div id="main">
+      <div class="header">
+          <h1>Budget Bot Help</h1>
+      </div>
+
+      <div class="content">
+        <h2 class="content-subhead"><a class='anchor' name='onthego'>Budget Bot on the Go</a></h2>
+        <p>The best part about Budget Bot is that you can use it wherever is most convenient. If you're at your computer, you can use this website. If you're on your phone, you can send a message through Facebook Messenger. If your hands aren't free, you can use your Alexa-enabled device. We try hard to meet you wherever is most convenient. You can use the "On the Go" section of the Budget Bot page to set up the Messenger and Alexa integrations.</p>
+        <p><a href="index.html#onthego" class="pure-button no-link">Set up Budget Bot on the Go</a></p>
+        <p>Once you've got those integrations set up, check out the next two sections for some tips and tricks for getting the most out of Budget Bot on the Go.</p>
+        <h2 class="content-subhead"><a class='anchor' name='Messenger'>Budget Bot on Messenger</a></h2>
+        <p>Budget Bot on Messenger supports two main types of actions: add a transaction, or view recent spending by category. To add a transaction just give a brief description of the spending, followed by the price. If you've set up <a href='#balances'>balance tracking</a>, include the name of the account, spelled the same way as how you set it up. The order doesn't matter. For examples, you could try some of the following:</p>
+        <ul>
+          <li>Rent $300</li>
+          <li>$0.99 hot dog, cash</li>
+          <li>Bought $5 fries with credit card</li>
+          <li>Paycheck for $450</li>
+        </ul>
+        <p>Budget Bot will respond with a confirmation message and will automatically categorize your transaction into one of the supported <a href="#categories">categories</a>. If we picked the wrong category, click "Edit Category" to fix it. You can also click "Delete This" to get rid of the transaction altogether.</p>
+        <p>You can also ask Budget Bot how much you've spent recently in a particular category. Just say the name of one of the supported <a href="#categories">categories</a> and Budget Bot will reply with how much you've spent on that category in the last 30 days. To get more detailed information about your spending, say "show my budget" to get a link to the full Budget Bot website.</p>
+        <p><a href="index.html#onthego" class="pure-button no-link">Set up Budget Bot for Messenger</a></p>
+        <h2 class="content-subhead"><a class='anchor' name='Alexa'>Budget Bot on Alexa</a></h2>
+        <p>Budget Bot on Alexa supports three main types of actions: add a transaction, view recent spending by category, or get personalized spending tips. To add a transaction, just say something like: </p>
+        <ul>
+          <li>Alexa, tell Budget Bot I spent $200 on rent</li>
+          <li>Alexa, tell Budget Bot I bought textbooks for $130</li>
+          <li>Alexa, tell Budget Bot I spent $7.25 on a hamburger</li>
+        </ul>
+        <p>When speaking to Alexa, it's important to always specify whether you mean dollars or cents For example, if you just say <i>seven ninety nine</i>, Alexa can't tell if you meant $7.99 or $799!</p>
+        <p>You can also ask Alexa about how much you've spent recently. The default is past 30 days, but you can specify a different amount of time if you prefer:
+        <ul>
+          <li>Alexa, ask Budget Bot how much I spent on groceries in the past year</li>
+          <li>Alexa, ask Budget Bot how much have I spent on dining in the past two weeks</li>
+        </ul>
+        <p>At the moment, you can only ask about your spending in one of the supported <a href="#categories">categories</a>, but we're always working on improving!</p>
+        <p>Finally, you can ask Alexa for advice. Just say "Alexa, ask Budget Bot for personalized spending tips!" You'll need to use Budget Bot consistently for a few weeks before we'll have enough data to give you useful suggestions. Try to enter your expenses every day so you can get the most accurate results!</p>
+        <p><a href="https://www.amazon.com/ALJO-Brothers-Budget-Bot/dp/B07BJH5Z1B/" class="pure-button no-link">Set up Budget Bot for Alexa</a></p>
+        <h2 class="content-subhead"><a class='anchor' name='categories'>Categories</a></h2>
+        <p>The current list of supported categories is as follows: Clothing, Dining, Education, Electronics, Entertainment, Groceries, Health, Home supplies, Housing, Income, Laundry, Miscellaneous, Office supplies, Pets, Travel. You can also manually add new categories, although those can't be used for automatically categorizing. We're always working on adding more categories though!</p>
+        <p><a href="index.html" class="pure-button no-link">Back to Budget Bot</a></p>
+        <h2 class="content-subhead"><a class='anchor' name='balances'>Balances</a></h2>
+        <p>Budget Bot can help you keep track of the balance in each of your accounts (including bank accounts, credit cards, and even cash). When you sign up for Budget Bot, we'll automatically create a cash account for you with a balance of 0. If you've got some cash on hand, go ahead and click the edit button <i class="fas fa-edit"></i> and update that balance! Save your changes using the <i class="fas fa-check"></i> icon, or cancel using the <i class="fas fa-ban"></i> icon. Then add the rest of your accounts and put in their current balances. If you realize you don't need an account at all, you can of course delete it using <i class="fas fa-trash-alt"></i>.
+        </p>
+        <p>Once you've got all your initial balances ready to go, keeping them updated is a breeze! When you enter a new budget item on the web, make sure to select the right account and we'll update the balance automatically. If you're using Messenger, you'll just need to mention the account name when you report the expense.
+        </p>
+        <p>On Alexa, accounts are currently not supported unfortunately. Expenses entered through Alexa won't be linked to an account, but the next time you log in to the web you can edit the expenses to set the correct account and we'll automatically fix up all the balances.</p>
+        </p>
+        <p><a href="index.html#accounts" class="pure-button no-link">Back to Budget Bot</a></p>
+        <h2 class="content-subhead"><a class='anchor' name='other'>Other</a></h2>
+        <p>Have a question about something that's not answered here? Send a quick email to <a href="mailto:questions@tellbudgetbot.com">questions@tellbudgetbot.com</a> and we'll get back to you as soon as we can! We also welcome your suggestions for ways to improve.</p>
+      </div>
+    </div>
+</div>
+
+<script
+        src="https://code.jquery.com/jquery-3.3.1.min.js"
+        integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
+        crossorigin="anonymous"></script>
+<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+<link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+<script src="https://www.chartjs.org/dist/2.7.1/Chart.bundle.js"></script>
+
+<script src="js/util.js"></script>
+<script src="js/ui.js"></script>
+
+</body>
+</html>
+
+

@@ -183,7 +183,15 @@ a.no-link.pure-button {
 	color: #000;
 	border-bottom: 1px dotted black;
 	text-decoration: none;
+	margin-left:4px;
 }
 [data-tooltip]:hover {
 	border-bottom: none;
+}
+
+.fa-sm{
+    -webkit-transform: scale(0.75,0.75);
+    -ms-transform: scale(0.75,0.75);
+    transform: scale(0.75,0.75);
+    vertical-align: middle;
 }

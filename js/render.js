@@ -29,7 +29,7 @@ function parseDollarNum(num) {
   if(num.charAt(0)=="$") {
     num = num.substr(1);
   }
-	num = num.replace(/,/g,"");
+  num = num.replace(/,/g,"");
   if(num.length == 0) {
     return NaN;
   }
@@ -397,6 +397,13 @@ function make_btn(type) {
   outer.appendChild(icon);
   return outer;
 }
+function make_tooltip(text) {
+  var btn = make_btn("fa-question-circle fa-sm");
+  var sup = document.createElement("sup");
+  btn.setAttribute("data-tooltip", text);
+  sup.appendChild(btn);
+  return sup;
+}
 function make_input() {
   var input = document.createElement("input");
   var outer = document.createElement("div");
@@ -429,6 +436,7 @@ function render_expense(datai) {
   var desc = document.createElement("span");
   var desc_inner = document.createElement("span");
   var cat = document.createElement("span");
+  var cat_info = null;
   var cat_inner = document.createElement("span");
   var acct = document.createElement("span");
   var acct_inner = document.createElement("span");
@@ -453,6 +461,7 @@ function render_expense(datai) {
   amt_inner.className="expense-amt-inner";
   amt.className = "expense-amt pure-u-lg-3-24 pure-u-6-24";
   cat_inner.innerText = category;
+  var cat_info = make_tooltip("Since most of your budget items are expenses, we consider expenses to be positive and income to be negative. Don't worry, we'll handle the math.");
   cat.className = "expense-category pure-u-lg-5-24 pure-u-9-24";
   acct_inner.innerText = account;
   acct.className = "expense-acct pure-u-lg-5-24 pure-u-11-24";
@@ -465,13 +474,13 @@ function render_expense(datai) {
 
   edit.addEventListener("click", function() {
     amt_edit.raw.value = format_raw_dollars(datai[1]["amount"]);
-		amt_edit.raw.placeholder = "Amount";
+    amt_edit.raw.placeholder = "Amount";
     cat_edit.raw.value = datai[1]["category_name"] || datai[1]["category"] || "";
-		cat_edit.raw.placeholder = "Category";
+    cat_edit.raw.placeholder = "Category";
     acct_edit.raw.value = datai[1]["account"] || "";
-		acct_edit.raw.placeholder = "Account";
+    acct_edit.raw.placeholder = "Account";
     desc_edit.raw.value = datai[1]["description"] || "";
-		desc_edit.raw.placeholder = "Description";
+    desc_edit.raw.placeholder = "Description";
     $( cat_edit.raw ).autocomplete({"source": state.categories});
     amt_edit.className = "expense-edit expense-amt-edit";
     cat_edit.className = "expense-edit category-sel";
@@ -531,6 +540,9 @@ function render_expense(datai) {
     amt_inner.innerText = format_dollars(newAmt);
     desc_inner.innerText = newDesc;
     cat_inner.innerText = newCat;
+    if(newCat.toLowerCase() == "income") {
+      cat_inner.appendChild(cat_info);
+    }
     var idx = acct_edit.raw.selectedIndex;
     if(idx >= 0) {
       acct_inner.innerText = acct_edit.raw.options[acct_edit.raw.selectedIndex].text;
@@ -562,6 +574,9 @@ function render_expense(datai) {
 
   amt.appendChild(amt_inner);
   desc.appendChild(desc_inner);
+  if(category.toLowerCase() == "income") {
+    cat_inner.appendChild(cat_info);
+  }
   cat.appendChild(cat_inner);
   acct.appendChild(acct_inner);
   btns_inner.appendChild(edit);
@@ -792,17 +807,17 @@ function submit_expense() {
   var data = auth();
   var desc = document.getElementById("description").value;
   data["description"]=desc;
-	var amt_el = document.getElementById("amount");
+  var amt_el = document.getElementById("amount");
   var amt = amt_el.value;
-	if(amt !== "") {
-		if(isDollarNum(amt)) {
-			data["amount"] = parseDollarNum(amt);
-		} else {
-			$(amt_el).addClass("error");
-			return;
-		}
-	}
-	$(amt_el).removeClass("error");
+  if(amt !== "") {
+    if(isDollarNum(amt)) {
+      data["amount"] = parseDollarNum(amt);
+    } else {
+      $(amt_el).addClass("error");
+      return;
+    }
+  }
+  $(amt_el).removeClass("error");
   var cat = document.getElementById("category").value;
   if(cat.length > 0) {
     data["category"]=cat;
@@ -819,7 +834,7 @@ function submit_expense() {
     data["timezone"] = noon.getTimezoneOffset();
   }
   if(desc.length > 0 || amt.length > 0) {
-		var statusEl = document.getElementById("add-expense-status");
+    var statusEl = document.getElementById("add-expense-status");
     function submit_expense_response(data) {
       if(data && data.error) {
         alert(data.error);
@@ -829,11 +844,11 @@ function submit_expense() {
       amt_el.value="";
       document.getElementById("category").value="";
       $.datepicker._clearDate($("#submit-date"));
-			statusEl.innerText = "Submitted.";
-			$(statusEl).fadeOut();
+      statusEl.innerText = "Submitted.";
+      $(statusEl).fadeOut();
     };
-		$(statusEl).show();
-		statusEl.innerText = "Submitting...";
+    $(statusEl).show();
+    statusEl.innerText = "Submitting...";
     $.ajax({
         type: "POST",
         url: host+"/add",
@@ -851,27 +866,27 @@ function submit_expense() {
 function submit_transfer() {
   var data = auth();
   data["description"] = "Transfer";
-	var amt_el = document.getElementById("transfer-amount");
+  var amt_el = document.getElementById("transfer-amount");
   var amt = amt_el.value;
-	if(isDollarNum(amt)) {
-		data["amount"] = parseDollarNum(amt);
-	} else {
-		$(amt_el).addClass("error");
-		return;
-	}
-	$(amt_el).removeClass("error");
+  if(isDollarNum(amt)) {
+    data["amount"] = parseDollarNum(amt);
+  } else {
+    $(amt_el).addClass("error");
+    return;
+  }
+  $(amt_el).removeClass("error");
   var cat = document.getElementById("account-dest").value;
   if(cat && cat.length > 0) {
     data["category"]=ACCT_PREFIX+cat;
   } else {
-		return;
-	}
+    return;
+  }
   var acct = document.getElementById("account-source").value;
   if(acct && acct.length > 0) {
     data["account"]=document.getElementById("account-source").value;
   } else {
-		return;
-	}
+    return;
+  }
   var date = $("#transfer-date").datepicker( "getDate" );
   if(date) {
     //TODO: timezone problems
@@ -879,29 +894,29 @@ function submit_transfer() {
     data["timestamp"] = noon.getTime() / 1000;
     data["timezone"] = noon.getTimezoneOffset();
   }
-	var statusEl = document.getElementById("add-transfer-status");
-	function submit_transfer_response(data) {
-		if(data && data.error) {
-			alert(data.error);
-		}
-		render();
-		amt_el.value="";
-		statusEl.innerText = "Submitted.";
-		$(statusEl).fadeOut();
-	};
-	$(statusEl).show();
-	statusEl.innerText = "Submitting...";
-	$.ajax({
-			type: "POST",
-			url: host+"/add",
-			data: data,
-			dataType: "json",
-			success: submit_transfer_response,
-			error: function(r,s,e) {
-				alert("Network error");
-				console.log(e);
-			}
-	});
+  var statusEl = document.getElementById("add-transfer-status");
+  function submit_transfer_response(data) {
+    if(data && data.error) {
+      alert(data.error);
+    }
+    render();
+    amt_el.value="";
+    statusEl.innerText = "Submitted.";
+    $(statusEl).fadeOut();
+  };
+  $(statusEl).show();
+  statusEl.innerText = "Submitting...";
+  $.ajax({
+      type: "POST",
+      url: host+"/add",
+      data: data,
+      dataType: "json",
+      success: submit_transfer_response,
+      error: function(r,s,e) {
+        alert("Network error");
+        console.log(e);
+      }
+  });
 }
 
 function expense_month_selector_changed() {
