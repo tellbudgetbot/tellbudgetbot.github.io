@@ -2,7 +2,7 @@ $('.switcher a').click(function(){
    $('form').animate({height: "toggle", opacity: "toggle"}, "slow");
 });
 function preinit() {
-  if(document.location.hash.indexOf("signup")!==-1) {
+  if(document.location.hash.indexOf("signup")!==-1 || window.location.search.indexOf("alexa")!==-1){
     $('form').animate({height: "toggle", opacity: "toggle"}, 50);
   }
 }
