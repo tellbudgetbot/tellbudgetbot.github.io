@@ -702,7 +702,7 @@ function render_pie() {
         } else {
           income_cats = "";
         }
-        document.getElementById("welcome-explore").innerText = "During this period your income totalled " + format_dollars(total_income) + " and your expenses totalled " + format_dollars(total_expenses) + "." + income_cats;
+        document.getElementById("welcome-explore").innerText = "During this period your income totaled " + format_dollars(total_income) + " and your expenses totaled " + format_dollars(total_expenses) + "." + income_cats;
       } else {
         $("#pieChartContainer").hide();
         document.getElementById("welcome-explore").innerText = "Welcome to Budget Bot! At the moment, there are no expenses for the time period selected, but once you enter in some expenses, you'll be able to visualize your spending here.";
@@ -872,7 +872,7 @@ function submit_transfer() {
   } else {
 		return;
 	}
-  var date = $("#submit-transfer").datepicker( "getDate" );
+  var date = $("#transfer-date").datepicker( "getDate" );
   if(date) {
     //TODO: timezone problems
     var noon = new Date(date.getFullYear(), date.getMonth(), date.getDate(), 12);
