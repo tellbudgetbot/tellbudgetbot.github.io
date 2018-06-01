@@ -195,3 +195,7 @@ a.no-link.pure-button {
     transform: scale(0.75,0.75);
     vertical-align: middle;
 }
+
+.phone-screenshot {
+  max-width: 400px;
+}
