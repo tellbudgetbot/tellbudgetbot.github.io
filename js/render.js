@@ -611,13 +611,24 @@ function dateFromTimestamp(tstmp) {
   return new Date(tstmp*1000);
 }
 
+function min(a,b) {
+  if(a===undefined) {
+    return b;
+  }
+  if(b===undefined) {
+    return a;
+  }
+  return Math.min(a,b);
+}
+
 function render_month_selector(sel, extra_lasts) {
   if(state.userinfo === null) {
     console.log("Error: no user info");
     return;
   }
   var create_time = state.userinfo.create_time;
-  var create_date = new Date(create_time * 1000);
+  var earliest_time = state.userinfo.earliest_txn;
+  var create_date = new Date(min(create_time,earliest_time) * 1000);
   var now = new Date();
   var cNode = null;
   var val = null;
