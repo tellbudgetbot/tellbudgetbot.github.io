@@ -1,8 +1,9 @@
 /* modified from https://purecss.io/layouts/side-menu/ */
 
+@import url(https://fonts.googleapis.com/css?family=Roboto:300);
 body {
     color: #555;
-    font-family: "Bitstream Vera Sans", "Helvetica", "Roman", sans-serif;
+    font-family: "Bitstream Vera Sans", "Roboto", "Roman", sans-serif;
 }
 
 .pure-img-responsive {

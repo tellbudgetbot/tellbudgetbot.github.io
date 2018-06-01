@@ -13,6 +13,12 @@
 <div class="login-page">
   <div class="form">
     <form class="register-form" onsubmit="signup(); return false;">
+      <p class="left">Hi, I'm Budget Bot, the budgeting solution for people who don't have time to budget! Entering expenses takes just seconds using Alexa, Facebook Messenger, or the web, and I'll give you tips to boost your savings! <a class="noblue" href="/video" onclick="showVideo(); return false;">See it in action</a>, or give it a try by signing up below.</p>
+      <div id="outerVideo">
+      <div class="videoWrapper">
+      <iframe id="video" width="560" height="315" src="https://www.youtube.com/embed/or5nrbG2Kd4?rel=0" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+      </div>
+      </div>
       <input type="text" placeholder="username" id="user1"/>
       <input type="text" placeholder="email" id="email1"/>
       <input type="password" placeholder="password" id="password1"/>
@@ -26,7 +32,7 @@
       <input type="text" placeholder="username" id="user2"/>
       <input type="password" placeholder="password" id="password2"/>
       <button>login</button>
-      <p class="message switcher">Not registered? <a href="#">Create an account</a></p>
+      <p class="message switcher">Not registered? <a href="#signup">Create an account</a></p>
       <p class="message"><a href="forgot.html">Forgot your password?</a></p>
     </form>
   </div>
