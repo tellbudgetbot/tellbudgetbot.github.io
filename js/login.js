@@ -1,5 +1,5 @@
 $('.switcher a').click(function(){
-   $('form').animate({height: "toggle", opacity: "toggle"}, "slow");
+   $('form').animate({height: "toggle", opacity: "toggle"}, 50);
 });
 function preinit() {
   if(document.location.hash.indexOf("signup")!==-1 || window.location.search.indexOf("alexa")!==-1){

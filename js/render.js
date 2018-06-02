@@ -9,11 +9,19 @@ var state = {
   "last_expense_change": "(unknown)",
   "last_category_change": "(unknown)",
   "last_pie_change": "(unknown)",
+  "last_goal_change": "(unknown)",
   "accounts": [],
   "categories": [],
   "userinfo": null
 };
-
+function getCurrentMonth() {
+  return MONTH_NAMES[new Date().getMonth()];
+}
+function getMonthStart() {
+  var now = new Date();
+  var start = new Date(now.getFullYear(), now.getMonth(), 1, 0, 0,0);
+  return start.getTime() / 1000.0;
+}
 function auth(){
   return {"token": token};
 }
@@ -273,6 +281,258 @@ function render_account_sel(accountsel, accounts){
     accountsel.parentNode.replaceChild(cNode, accountsel);
   }
   return cNode;
+}
+
+function render_goal_heading() {
+  var thead = document.createElement("thead");
+  var tr = document.createElement("tr");
+  var cat_td = document.createElement("th");
+  var goal_td = document.createElement("th");
+  var actual_td = document.createElement("th");
+  var update_td = document.createElement("th");
+  cat_td.innerText="Category";
+  goal_td.innerText="Monthly Goal";
+  actual_td.innerText="%s so far".replace("%s",getCurrentMonth());
+  cat_td.className="category-td";
+  goal_td.className="goal-td";
+  actual_td.className="actual-td";
+  update_td.className="update-td";
+  tr.appendChild(cat_td);
+  tr.appendChild(goal_td);
+  tr.appendChild(actual_td);
+  tr.appendChild(update_td);
+  thead.appendChild(tr);
+  return thead;
+}
+
+function render_goal(datai) {
+  var goal = datai["amount"];
+  var category = datai["category"];
+  var spending = datai["spending"];
+  var earning = datai["earning"];
+  var actualNum = spending - earning;
+  if(spending >= earning) {
+    actual = format_dollars(spending - earning);
+  } else if (earning > spending) {
+    actual = "Earned " + format_dollars(earning - spending);
+  }
+
+  var tr = document.createElement("tr");
+  var cat_td = document.createElement("td");
+  var goal_td = document.createElement("td");
+  var actual_td = document.createElement("td");
+  var goal_inner = document.createElement("span");
+  var actual_inner = document.createElement("span");
+  var buttons_inner = document.createElement("span");
+  var buttons_edit = document.createElement("span");
+  var update_td = document.createElement("td");
+  var edit_btn = make_btn("fa-edit");
+  var del_btn = make_btn("fa-trash-alt");
+  var save_btn = make_btn("fa-check");
+  var cancel_btn = make_btn("fa-ban");
+  var goal_edit = make_input();
+  edit_btn.className = "btn goal-btn";
+  del_btn.className = "btn goal-btn";
+  save_btn.className = "btn goal-btn";
+  cancel_btn.className = "btn goal-btn";
+  buttons_inner.appendChild(edit_btn);
+  buttons_inner.appendChild(del_btn);
+  buttons_edit.appendChild(save_btn);
+  buttons_edit.appendChild(cancel_btn);
+  cat_td.innerText = category;
+  goal_inner.innerText = format_dollars(goal);
+  actual_inner.innerText = actual;
+  edit_btn.addEventListener("click", function() {
+    goal_edit.raw.value = format_raw_dollars(goal);
+    goal_edit.className = "goal-edit";
+    goal_td.replaceChild(goal_edit, goal_inner);
+    update_td.replaceChild(buttons_edit, buttons_inner);
+  });
+  function showInner() {
+    goal_td.replaceChild(goal_inner, goal_edit);
+    update_td.replaceChild(buttons_inner, buttons_edit);
+  }
+  function setActualTdClass(currentGoal) {
+    actual_td.className="actual-td";
+    if(actualNum > currentGoal) {
+      actual_td.className += " warning";
+    }
+  }
+  cancel_btn.addEventListener("click", function() {
+    showInner();
+  });
+  save_btn.addEventListener("click", function() {
+    var newGoal = goal_edit.raw.value;
+    if(!isDollarNum(newGoal)) {
+      $(goal_edit.raw).addClass("error");
+      return;
+    } else {
+      $(goal_edit.raw).removeClass("error");
+    }
+    newGoal = parseDollarNum(newGoal);
+    goal_inner.innerText = format_dollars(newGoal);
+    setActualTdClass(newGoal);
+    showInner();
+    if(Math.abs(newGoal - goal) > 0.001) {
+      var data = auth();
+      data["category"] = category;
+      data["amount"] = newGoal;
+      $.ajax({
+          type: "POST",
+          url: host+"/set_goal",
+          data: data,
+          dataType: "json",
+          success: function(data) {
+            if(data && data.error) {
+              alert(data.error);
+            }
+            render_goals();
+          },
+          error: function(r,s,e) {
+            alert("Network error");
+            console.log(e);
+          }
+      });
+    }
+  });
+  del_btn.addEventListener("click", function() {
+    if(confirm("Are you sure you want to delete this goal?")){
+      var data = auth();
+      data["category"] = category;
+      data["amount"] = null;
+      tr.parentNode.removeChild(tr);
+      $.ajax({
+          type: "POST",
+          url: host+"/set_goal",
+          data: data,
+          dataType: "json",
+          success: function(data) {
+            if(data && data.error) {
+              alert(data.error);
+            }
+            render_goals();
+          },
+          error: function(r,s,e) {
+            alert("Network error");
+            console.log(e);
+          }
+      });
+    }
+  });
+  cat_td.className="category-td";
+  goal_td.className="goal-td";
+  update_td.className="update-td";
+  setActualTdClass(goal);
+  goal_td.appendChild(goal_inner);
+  actual_td.appendChild(actual_inner);
+  update_td.appendChild(buttons_inner);
+  tr.appendChild(cat_td);
+  tr.appendChild(goal_td);
+  tr.appendChild(actual_td);
+  tr.appendChild(update_td);
+  return tr;
+}
+
+function render_goal_response(raw_data) {
+  if(raw_data.cached) {
+    return;
+  }
+  state.last_goal_change = raw_data.last_change;
+  var data = raw_data.goals;
+
+  var node = document.getElementById("goal-content");
+  var cNode = node.cloneNode(false);
+
+  if(data.length > 0) {
+    var table = document.createElement("table");
+    table.className="pure-table";
+    table.appendChild(render_goal_heading());
+    var tbody = document.createElement("tbody");
+
+    for(var i = 0; i < data.length; i++) {
+      tbody.appendChild(render_goal(data[i]));
+    }
+    table.appendChild(tbody);
+    cNode.appendChild(table);
+  } else {
+    var p = document.createElement("p");
+    p.innerText = "No goals yet. Go ahead and add one!";
+    cNode.appendChild(p);
+  }
+  node.parentNode.replaceChild(cNode, node);
+}
+
+function add_goal(){
+  var category = document.getElementById("new-goal-cat").value;
+  var amt = document.getElementById("new-goal-amt").value;
+  if(!category) {
+    alert("You must choose a category for the new goal.");
+    return;
+  }
+  if(!isDollarNum(amt)){
+    alert("You must enter a spending target.");
+    return;
+  }
+  amt = parseDollarNum(amt);
+  var data = auth();
+  data["category"] = category;
+  data["amount"] = amt;
+  $.ajax({
+      type: "POST",
+      url: host+"/set_goal",
+      data: data,
+      dataType: "json",
+      success: function(data) {
+        if(data) {
+          if(data.error) {
+            alert(data.error);
+          } else {
+            document.getElementById("new-goal-cat").value = "";
+            document.getElementById("new-goal-amt").value = "";
+          }
+          render_goals();
+        }
+      },
+      error: function(r,s,e) {
+        console.log(e);
+        alert("Network error");
+      }
+  });
+}
+/*function render_add_goal_btn(){
+  var btn = document.createElement("button");
+  }
+  var p = document.createElement("div");
+  var intro = document.createElement("span");
+  intro.innerText = "Add a new goal in category: ";
+  var cat_sel = make_input();
+  cat_sel.className = "new-goal-cat category-sel";
+  $( cat_sel.raw ).autocomplete({"source": state.categories});
+  btn.innerText = "Add Goal";
+  btn.className="pure-button";
+  //btn.addEventListener("click", add_account);
+  p.appendChild(intro);
+  p.appendChild(cat_sel);
+  p.appendChild(btn);
+  return p;
+}*/
+
+function render_goals() {
+  var dt = auth();
+  dt["last_change"] = state.last_goal_change;
+  dt["start_time"] = getMonthStart();
+  $.ajax({
+      type: "POST",
+      url: host+"/get_goals",
+      data: dt,
+      dataType: "json",
+      success: function(data) {
+        render_goal_response(data);
+      },
+      error: function(r,s,e) {
+        console.log(e);
+      }
+  });
 }
 
 function render_balance_response(raw_data) {
@@ -958,6 +1218,7 @@ function render() {
     render_add_expense();
     render_expenses();
     render_pie();
+    render_goals();
   });
 }
 

@@ -52,7 +52,7 @@ a.no-link.pure-button {
 .expense-line {
   padding: 0.1em 0.1em;
 }
-.expense-amt, .expense-amt-edit .raw-input, td.balance-td, .balance-td .raw-input {
+.expense-amt, .expense-amt-edit .raw-input, td.balance-td, .balance-td .raw-input, td.goal-td, td.actual-td, .goal-td .raw-input {
   text-align:right;
 }
 .expense-amt-inner {
@@ -72,7 +72,8 @@ a.no-link.pure-button {
 }
 
 .account-del-btn, .account-cancel-btn,
-.account-save-btn, .account-edit-btn {
+.account-save-btn, .account-edit-btn,
+.goal-btn {
   margin-left:0.2em;
   margin-right:0.2em;
 }
@@ -94,6 +95,9 @@ a.no-link.pure-button {
 .error {
   background-color:#FF9494;
 }
+.warning, .actual-td.warning {
+  background-color:#FFB677;
+}
 
 .account-td {
   width:20em;
@@ -105,6 +109,16 @@ a.no-link.pure-button {
   max-width:2.8em;
   text-align:center;
   line-height: 1.8em;
+}
+
+.category-td {
+  width:8em;
+}
+.goal-td {
+  width:8em;
+}
+.actual-td {
+  width:9em;
 }
 
 @media screen and (min-width: 64em) {
