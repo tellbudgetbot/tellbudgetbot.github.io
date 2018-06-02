@@ -675,7 +675,8 @@ function render_pie() {
     }
     state.last_pie_change = raw_data.last_change;
     var data = raw_data.items;
-    var cat_sums = {};
+    var cat_spend = {};
+    var cat_earn = {};
     var cats = [];
     for(var i = 0; i < data.length; i++) {
       if(isNum(data[i][1]["amount"])) {
@@ -684,17 +685,22 @@ function render_pie() {
           cat = "Uncategorized";
         }
         var amt = Number(data[i][1]["amount"]);
-        if(cat_sums[cat] === null || cat_sums[cat] === undefined) {
-          cat_sums[cat]=0.0;
+        if(cat_spend[cat] === null || cat_spend[cat] === undefined) {
+          cat_spend[cat]=0.0;
+          cat_earn[cat]=0.0;
           cats.push(cat);
         }
-        cat_sums[cat]+=amt;
+        if(amt > 0) {
+          cat_spend[cat]+=amt;
+        } else if(amt < 0) {
+          cat_earn[cat]-=amt;
+        }
       }
     }
     cats.sort(function(a,b) {
-      return cat_sums[b] - cat_sums[a];
+      return cat_spend[b] - cat_spend[a];
     });
-    if(get_cat(cat_sums,"Entertainment") > get_cat(cat_sums,"Groceries") + get_cat(cat_sums,"Eating out")) {
+    if(get_cat(cat_spend,"Entertainment") > get_cat(cat_spend,"Groceries") + get_cat(cat_spend,"Eating out")) {
       document.getElementById("warnings").innerText = "Suggestion: Your spending on entertainment exceeds your spending on food. To save money, consider reducing entertainment expenses.";
     } else {
       document.getElementById("warnings").innerText = "";
@@ -709,13 +715,14 @@ function render_pie() {
         var total_expenses = 0;
         var only_income_cat = true;
         for(var i = 0; i < cats.length; i++) {
-          if(cat_sums[cats[i]] > 0 && !starts_with(cats[i],ACCT_PREFIX)) {
+          if(cat_spend[cats[i]] > 0 && !starts_with(cats[i],ACCT_PREFIX)) {
             categoryPieChart.data.labels.push(cats[i]);
-            categoryPieChart.data.datasets[0].data.push(cat_sums[cats[i]].toFixed(2));
-            total_expenses += cat_sums[cats[i]];
-          } else if(cat_sums[cats[i]] < 0) {
-            incomes.push(cats[i] + ": " + format_dollars(-cat_sums[cats[i]]));
-            total_income -= cat_sums[cats[i]];
+            categoryPieChart.data.datasets[0].data.push(cat_spend[cats[i]].toFixed(2));
+            total_expenses += cat_spend[cats[i]];
+          }
+          if(cat_earn[cats[i]] > 0) {
+            incomes.push(cats[i] + ": " + format_dollars(cat_earn[cats[i]]));
+            total_income += cat_earn[cats[i]];
             if(cats[i] !== "Income") {
               only_income_cat = false;
             }
@@ -724,7 +731,7 @@ function render_pie() {
         categoryPieChart.update();
         var income_cats = "";
         if(incomes.length > 1) {
-          income_cats = "Your income can be divided into categories as follows: " + incomes.join(",");
+          income_cats = " Your income can be divided into categories as follows: " + incomes.join(", ");
         } else {
           income_cats = "";
         }
