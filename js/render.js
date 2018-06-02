@@ -291,7 +291,7 @@ function render_goal_heading() {
   var actual_td = document.createElement("th");
   var update_td = document.createElement("th");
   cat_td.innerText="Category";
-  goal_td.innerText="Monthly Goal";
+  goal_td.innerText="Monthly Plan";
   actual_td.innerText="%s so far".replace("%s",getCurrentMonth());
   cat_td.className="category-td";
   goal_td.className="goal-td";
@@ -396,7 +396,7 @@ function render_goal(datai) {
     }
   });
   del_btn.addEventListener("click", function() {
-    if(confirm("Are you sure you want to delete this goal?")){
+    if(confirm("Are you sure you want to delete the plan for this category?")){
       var data = auth();
       data["category"] = category;
       data["amount"] = null;
@@ -456,7 +456,7 @@ function render_goal_response(raw_data) {
     cNode.appendChild(table);
   } else {
     var p = document.createElement("p");
-    p.innerText = "No goals yet. Go ahead and add one!";
+    p.innerText = "No plans set up yet. Go ahead and add one!";
     cNode.appendChild(p);
   }
   node.parentNode.replaceChild(cNode, node);
@@ -466,11 +466,11 @@ function add_goal(){
   var category = document.getElementById("new-goal-cat").value;
   var amt = document.getElementById("new-goal-amt").value;
   if(!category) {
-    alert("You must choose a category for the new goal.");
+    alert("You must choose a category for the new plan.");
     return;
   }
   if(!isDollarNum(amt)){
-    alert("You must enter a spending target.");
+    alert("You must enter a spending maximum.");
     return;
   }
   amt = parseDollarNum(amt);
