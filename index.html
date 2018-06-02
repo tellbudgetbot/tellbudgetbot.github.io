@@ -75,8 +75,8 @@
                 <li class="pure-menu-item"><a href="#addexpense" class="pure-menu-link">Add Expense</a></li>
                 <li class="pure-menu-item"><a href="#explore" class="pure-menu-link">Explore</a></li>
                 <li class="pure-menu-item"><a href="#plan" class="pure-menu-link">Plan</a></li>
-                <li class="pure-menu-item"><a href="#addtransfer" class="pure-menu-link">Add Transfer</a></li>
                 <li class="pure-menu-item"><a href="#view" class="pure-menu-link">Transactions</a></li>
+                <li class="pure-menu-item"><a href="#addtransfer" class="pure-menu-link">Add Transfer</a></li>
                 <li class="pure-menu-item"><a href="#account" class="pure-menu-link">Account</a></li>
                 <li class="pure-menu-item"><a href="help.html" class="pure-menu-link">Help</a></li>
             </ul>
@@ -151,6 +151,14 @@
             </form>
 				</div>
 				<div class="content">
+            <h2 class="content-subhead"><a class='anchor' name='view'>Transactions</a></h2>
+            <select id="expenses-month-sel">
+            <option value="LAST7">Last 7 days</option>
+            </select>
+						<div id="expenses">Loading...</div>
+            <div id="welcome-expenses"></div>
+				</div>
+				<div class="content">
             <h2 class="content-subhead"><a class='anchor' name='addtransfer'>Add Transfer</a></h2>
 						<div id="add-transfer">
             <form class="pure-form-stacked" onsubmit="submit_transfer(); return false;">
@@ -164,14 +172,6 @@
             </form>
 						<div id="add-transfer-status"></div>
             </div>
-				</div>
-				<div class="content">
-            <h2 class="content-subhead"><a class='anchor' name='view'>Transactions</a></h2>
-            <select id="expenses-month-sel">
-            <option value="LAST7">Last 7 days</option>
-            </select>
-						<div id="expenses">Loading...</div>
-            <div id="welcome-expenses"></div>
 				</div>
         <div class="content">
             <h2 class="content-subhead"><a class='anchor' name='account'>Account</a></h2>
