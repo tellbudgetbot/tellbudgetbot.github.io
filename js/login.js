@@ -32,6 +32,7 @@ function signup(){
   var check13 = document.getElementById("check13").checked;
   var checkTOS = document.getElementById("checkTOS").checked;
   var checkEmail = document.getElementById("checkEmail").checked;
+  var timezone = new Date().getTimezoneOffset();
   var check = passwordComplexityCheck(pass);
   if(check) {
     alert(check);
@@ -49,7 +50,7 @@ function signup(){
     alert("Sorry, you must agree to the Terms of Service and Privacy Policy in order to use Budget Bot.");
     return;
   }
-  $.post(host+"/signup", {"user":user,"email":email,"pass":pass,"check13":check13,"checkTOS":checkTOS,"checkEmail":checkEmail}, function( data ) {
+  $.post(host+"/signup", {"user":user,"email":email,"pass":pass,"check13":check13,"checkTOS":checkTOS,"checkEmail":checkEmail,"timezone": timezone}, function( data ) {
     if(data.error === undefined) {
       redir(user,data);
     } else {

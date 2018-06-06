@@ -433,6 +433,11 @@ function render_goal(datai) {
   return tr;
 }
 
+//TODO: Not used
+function delete_all_goals() {
+
+}
+
 function render_goal_response(raw_data) {
   if(raw_data.cached) {
     return;
@@ -499,23 +504,17 @@ function add_goal(){
       }
   });
 }
-/*function render_add_goal_btn(){
+
+//TODO: Not used
+function render_delete_all_goal_btn(){
   var btn = document.createElement("button");
-  }
   var p = document.createElement("div");
-  var intro = document.createElement("span");
-  intro.innerText = "Add a new goal in category: ";
-  var cat_sel = make_input();
-  cat_sel.className = "new-goal-cat category-sel";
-  $( cat_sel.raw ).autocomplete({"source": state.categories});
-  btn.innerText = "Add Goal";
+  btn.innerText = "Delete All Plans";
   btn.className="pure-button";
-  //btn.addEventListener("click", add_account);
-  p.appendChild(intro);
-  p.appendChild(cat_sel);
+  btn.addEventListener("click", delete_all_goals);
   p.appendChild(btn);
   return p;
-}*/
+}
 
 function render_goals() {
   var dt = auth();
@@ -1229,10 +1228,12 @@ function init() {
 }
 
 function setup() {
+  var dt = auth();
+  dt["timezone"] = new Date().getTimezoneOffset();
   $.ajax({
       type: "POST",
       url: host+"/userinfo",
-      data: auth(),
+      data: dt,
       dataType: "json",
       success: function(data) {
         if(data.error!==undefined) {
