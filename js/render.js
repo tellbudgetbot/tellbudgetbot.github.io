@@ -966,7 +966,6 @@ function render_pie() {
     }
     if(categoryPieChart) {
       if(cats.length > 0) {
-        $("#pieChartContainer").show();
         categoryPieChart.data.labels.length = 0;
         categoryPieChart.data.datasets[0].data.length = 0;
         var incomes = [];
@@ -974,27 +973,34 @@ function render_pie() {
         var total_expenses = 0;
         var only_income_cat = true;
         for(var i = 0; i < cats.length; i++) {
-          if(cat_spend[cats[i]] > 0 && !starts_with(cats[i],ACCT_PREFIX)) {
-            categoryPieChart.data.labels.push(cats[i]);
-            categoryPieChart.data.datasets[0].data.push(cat_spend[cats[i]].toFixed(2));
-            total_expenses += cat_spend[cats[i]];
-          }
-          if(cat_earn[cats[i]] > 0) {
-            incomes.push(cats[i] + ": " + format_dollars(cat_earn[cats[i]]));
-            total_income += cat_earn[cats[i]];
-            if(cats[i] !== "Income") {
-              only_income_cat = false;
+          if(!starts_with(cats[i],ACCT_PREFIX)) {
+            if(cat_spend[cats[i]] > 0) {
+              categoryPieChart.data.labels.push(cats[i]);
+              categoryPieChart.data.datasets[0].data.push(cat_spend[cats[i]].toFixed(2));
+              total_expenses += cat_spend[cats[i]];
+            }
+            if(cat_earn[cats[i]] > 0) {
+              incomes.push(cats[i] + ": " + format_dollars(cat_earn[cats[i]]));
+              total_income += cat_earn[cats[i]];
+              if(cats[i] !== "Income") {
+                only_income_cat = false;
+              }
             }
           }
         }
-        categoryPieChart.update();
         var income_cats = "";
         if(incomes.length > 1) {
           income_cats = " Your income can be divided into categories as follows: " + incomes.join(", ");
         } else {
           income_cats = "";
         }
-        document.getElementById("welcome-explore").innerText = "During this period your income totaled " + format_dollars(total_income) + " and your expenses totaled " + format_dollars(total_expenses) + "." + income_cats;
+        if(total_expenses > 0) {
+          categoryPieChart.update();
+          $("#pieChartContainer").show();
+        } else {
+          $("#pieChartContainer").hide();
+        }
+        document.getElementById("welcome-explore").innerText = "During this period your income totaled " + format_dollars(total_income) + " and your spending totaled " + format_dollars(total_expenses) + "." + income_cats;
       } else {
         $("#pieChartContainer").hide();
         document.getElementById("welcome-explore").innerText = "Welcome to Budget Bot! At the moment, there are no expenses for the time period selected, but once you enter in some expenses, you'll be able to visualize your spending here.";
