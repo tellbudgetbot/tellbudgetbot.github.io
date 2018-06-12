@@ -82,14 +82,17 @@ function render_account_sel(accountsel, accounts){
   return cNode;
 }
 
-function submit_pending_expenses(callback) {
+var submit_lock_global = null;
+function submit_pending_expenses(submit_lock) {
+  if(submit_lock_global && submit_lock !== submit_lock_global) {
+    return;
+  }
+  submit_lock_global = submit_lock;
   try {
     var raw = localStorage.getItem("pending_expenses") || "[]";
     var old = JSON.parse(raw);
     if(old.length == 0) {
-      if(callback) {
-        callback();
-      }
+      submit_lock_global = null;
       return;
     }
     data = old.shift();
@@ -103,15 +106,17 @@ function submit_pending_expenses(callback) {
             console.log(data.error);
           } else {
             localStorage.setItem("pending_expenses", JSON.stringify(old));
-            submit_pending_expenses(callback);
+            submit_pending_expenses(submit_lock);
           }
         },
         error: function(r,s,e) {
           console.log(e);
+          submit_lock_global = null;
         }
     });
   } catch (e) {
     console.log(e);
+    submit_lock_global = null;
   }
 }
 
@@ -139,7 +144,7 @@ function get_expense_data(data) {
       data["amount"] = parseDollarNum(amt);
     } else {
       $(amt_el).addClass("error");
-      return;
+      return false;
     }
   }
   $(amt_el).removeClass("error");
@@ -158,4 +163,5 @@ function get_expense_data(data) {
     data["timestamp"] = noon.getTime() / 1000;
     data["timezone"] = noon.getTimezoneOffset();
   }
+  return true;
 }

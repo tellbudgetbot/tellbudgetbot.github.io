@@ -18,6 +18,19 @@ function get_accounts() {
     return [];
   }
 }
+function get_categories() {
+  var cats = localStorage.getItem("categories");
+  if(cats) {
+    try {
+      return JSON.parse(cats);
+    } catch (e) {
+      console.log(e);
+      return [];
+    }
+  } else {
+    return [];
+  }
+}
 
 function add_pending_expense(data) {
   try {
@@ -40,7 +53,6 @@ function render_pending(){
     if(old.length > 0) {
       text = old.length + " pending " + plural("expense",old.length) + " will be submitted when you reconnect."
     }
-    console.log(old)
     document.getElementById("pending_count").innerText = text;
   } catch (e) {
     console.log(e);
@@ -49,7 +61,10 @@ function render_pending(){
 
 function submit_expense_offline() {
   var data = auth();
-  get_expense_data(data);
+  var result = get_expense_data(data);
+  if(!result) {
+    return;
+  }
   if(!data["timestamp"]) {
     data["timestamp"] = (new Date().getTime()) / 1000;
   }
@@ -61,6 +76,10 @@ function submit_expense_offline() {
     } else {
       statusEl.innerText = "Error.";
     }
+    document.getElementById("description").value="";
+    document.getElementById("amount").value="";
+    document.getElementById("category").value="";
+    $.datepicker._clearDate($("#submit-date"));
     $(statusEl).fadeOut();
     render_pending();
   }
@@ -68,17 +87,20 @@ function submit_expense_offline() {
 
 function setup() {
   document.getElementById("logoutBtn").onclick = logout;
-  check_online(function(online){
-    if(online) {
-      document.location.href="index.html";
-    }
-  });
+  setInterval(function() {
+    check_online(function(online){
+      if(online) {
+        document.location.href="index.html";
+      }
+    });
+  }, 5000);
 
   $( function() {
     $( ".datepicker" ).datepicker();
   } );
   var accountsel = document.getElementById("account-sel");
   render_account_sel(accountsel, get_accounts());
+  $( ".category-sel" ).autocomplete({"source": get_categories()});
   render_pending();
 }
 

@@ -2,7 +2,8 @@ import os
 macros = dict()
 for filename in os.listdir("macros"):
   with open("macros/"+filename) as f:
-    macros[filename] = f.read()
+    if filename.endswith(".html"):
+      macros[filename] = f.read()
 for filename in os.listdir("html"):
   if filename.endswith(".html"):
     with open("html/"+filename) as f:

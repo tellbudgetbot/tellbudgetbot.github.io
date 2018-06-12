@@ -33,7 +33,7 @@ function change_email() {
       alert(data.error);
     }
   },"json").fail(function() {
-    alert("Sorry, an error occurred.");
+    alert("Network error");
   });
 }
 function preinit() {
@@ -51,7 +51,7 @@ function setup() {
       document.getElementById("old_email").innerText = "unknown";
     }
   },"json").fail(function() {
-    document.getElementById("old_email").innerText = "unknown";
+    document.getElementById("old_email").innerText = "unknown (network error)";
   });
 }
 preinit();

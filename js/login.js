@@ -22,7 +22,7 @@ function login(){
       alert(data.error);
     }
   },"json").fail(function() {
-    console.log('Error');
+    alert('Network error');
   });
 }
 function signup(){
@@ -57,7 +57,7 @@ function signup(){
       alert(data.error)
     }
   },"json").fail(function() {
-    console.log('Error');
+    alert('Network error');
   });
 }
 function startsWith(str,start){
