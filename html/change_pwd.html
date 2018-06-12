@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="en">
+<head>
+<?meta.html?>
+    <link rel="stylesheet" type="text/css" href="css/login.css" />
+    <title>Budget Bot</title>
+</head>
+<body>
+
+<!-- source: https://codepen.io/colorlib/pen/rxddKy -->
+<div class="login-page">
+  <div class="form">
+    <form class="left" onsubmit="change_pwd(); return false;">
+      <p>Old password:</p>
+      <input type="password" placeholder="old password" id="old_pwd"/>
+      <p>New password:</p>
+      <input type="password" placeholder="new password" id="new_pwd"/>
+      <p>Repeat new password:</p>
+      <input type="password" placeholder="new password" id="new_pwd2"/>
+      <button>submit</button>
+      <p class="message"><a href="index.html">Cancel</a></p>
+    </form>
+  </div>
+</div>
+<script src="lib/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="></script>
+<script src="js/util.js"></script>
+<script>
+var user;
+var token;
+function change_pwd() {
+  var old_pwd = document.getElementById("old_pwd").value;
+  var new_pwd = document.getElementById("new_pwd").value;
+  var new_pwd2 = document.getElementById("new_pwd2").value;
+  if(new_pwd!==new_pwd2) {
+    alert("Passwords do not match. Please enter the new password twice.");
+    return;
+  }
+  var check = passwordComplexityCheck(new_pwd);
+  if(check) {
+    alert(check);
+    return;
+  }
+  $.post(host+"/change_password", {"token":token,"old_pass":old_pwd,"new_pass":new_pwd}, function( data ) {
+    if(data.error === undefined ) {
+      alert("Password updated.");
+      document.location.href="index.html";
+    } else {
+      alert(data.error);
+    }
+  },"json").fail(function() {
+    alert("Sorry, an error occurred.");
+  });
+
+}
+function preinit() {
+  user = localStorage.getItem("user");
+  token = localStorage.getItem("token");
+  if(user === null || token == null) {
+    document.location.href = "login.html";
+  }
+}
+preinit();
+</script>
+</body>
+</html>

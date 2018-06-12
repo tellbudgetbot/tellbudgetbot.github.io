@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en">
+<head>
+<?meta.html?>
+<?side-menu.html?>
+    <title>Budget Bot</title>
+</head>
+<body>
+
+
+<div id="layout">
+    <div id="main">
+        <div class="header">
+            <h1>Budget Bot</h1>
+        </div>
+				<div class="content">
+            <h2 class="content-subhead"><a class='anchor' name='addexpense'>Add Expense</a></h2>
+						<div id="add-expense">
+            <form class="pure-form-stacked" onsubmit="submit_expense_offline(); return false;">
+                <fieldset>
+                <input id="description" autocomplete="off" type="text" data-lpignore="true" placeholder="Description"/>
+                <input id="amount" autocomplete="off" type="text" data-lpignore="true" placeholder="Amount"/>
+                <input id="category" autocomplete="off" class="category-sel" data-lpignore="true" type="text" placeholder="Category"/>
+                <select id="account-sel"></select>
+                <input id="submit-date" data-lpignore="true" type="text" class="datepicker" autocomplete="off" placeholder="Date (default today)"/>
+                <button class="pure-button pure-button-primary">Submit</button>
+                </fieldset>
+            </form>
+						<div id="add-expense-status"></div>
+            </div>
+            <p>You are offline. If you enter expenses, they will be automatically uploaded the next time that you are online again. Or you can <a href="#" id="logoutBtn" class="noblue">log out</a>. </p>
+            <p id="pending_count"></p>
+            <!--<p class="tall"><a href="#" id="logoutBtn" class="pure-button no-link">Log out</a>-->
+				</div>
+<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+<script src="lib/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="></script>
+<script src="lib/jquery-ui.js"></script>
+<link rel="stylesheet" href="lib/jquery-ui.css">
+
+<script src="js/util.js"></script>
+<script src="js/offline.js"></script>
+
+</body>
+</html>

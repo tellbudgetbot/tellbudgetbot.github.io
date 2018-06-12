@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en">
+<head>
+<?meta.html?>
+    <link rel="stylesheet" type="text/css" href="css/login.css" />
+    <title>Budget Bot</title>
+</head>
+<body>
+
+<script>
+  window.fbAsyncInit = function() {
+    FB.init({
+      //appId            : '399188853913433', Bot
+      appId            : '264165663994086', // helper
+      autoLogAppEvents : true,
+      xfbml            : true,
+      version          : 'v2.12'
+    });
+  };
+
+  (function(d, s, id){
+     var js, fjs = d.getElementsByTagName(s)[0];
+     if (d.getElementById(id)) {return;}
+     js = d.createElement(s); js.id = id;
+     js.src = "https://connect.facebook.net/en_US/sdk.js";
+     fjs.parentNode.insertBefore(js, fjs);
+   }(document, 'script', 'facebook-jssdk'));
+</script>
+
+<div class="login-page">
+  <div class="form" onsubmit="redirect(); return false;">
+    <form class="left">
+    <p>To make budgeting as convenient as possible, you can also message Budget Bot in Facebook messenger! Click below to enable.</p>
+      <!--
+      messenger_app_id="264165663994086" bot
+      messenger_app_id="399188853913433" helper
+  		page_id="274453546336424"
+      -->
+    <div class="fb-send-to-messenger"
+      id="messenger-link"
+      messenger_app_id="264165663994086"
+      page_id="205308756748960"
+      color="blue"
+      size="xlarge">
+    </div>
+    <p>Then, click below to finish linking your account for the Alexa skill.</p>
+    <button>link alexa</button>
+    </form>
+  </div>
+</div>
+
+<script>
+var token = localStorage.getItem("token");
+var uri = localStorage.getItem("redirect_uri");
+document.getElementById("messenger-link").setAttribute("data-ref",token);
+function redirect() {
+  document.location.href = uri;
+}
+
+</script>
+
+</body>
+</html>

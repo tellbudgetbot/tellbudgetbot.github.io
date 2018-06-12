@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en">
+<head>
+<?meta.html?>
+    <link rel="stylesheet" type="text/css" href="css/login.css" />
+    <title>Budget Bot</title>
+</head>
+<body>
+
+<!-- source: https://codepen.io/colorlib/pen/rxddKy -->
+<div class="login-page">
+  <div class="form">
+    <form class="register-form" onsubmit="signup(); return false;">
+      <p class="left">Hi, I'm Budget Bot, the budgeting solution for people who don't have time to budget! Entering expenses takes just seconds using Alexa, Facebook Messenger, or the web, and I'll give you tips to boost your savings! <a class="noblue" href="/video" onclick="showVideo(); return false;">See it in action</a>, or give it a try by signing up below.
+      <span class="switcher"><a href="#" class="noblue">Already registered?</a></span>
+      <div id="outerVideo">
+      <div class="videoWrapper">
+      <iframe id="video" width="560" height="315" src="https://www.youtube.com/embed/or5nrbG2Kd4?rel=0" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+      </div>
+      </div>
+      <input type="text" placeholder="username" id="user1"/>
+      <input type="text" placeholder="email" id="email1"/>
+      <input type="password" placeholder="password" id="password1"/>
+      <div class="checkbox-wrapper"><label><input type="checkbox" id="check13"/>I am at least 13 years old.</label></div>
+      <div class="checkbox-wrapper"><label><input type="checkbox" id="checkTOS"/>I agree to the <a href="tos.html" class="noblue">Terms of Service</a> and the processing of my data in accordance with the <a href="privacy.html" class="noblue">Privacy Policy</a>.</label></div>
+      <div class="checkbox-wrapper"><label><input type="checkbox" id="checkEmail"/>I would like to receive occasional emails about new features, products, and deals. (optional)</label></div>
+      <button>create</button>
+      <p class="message switcher">Already registered? <a href="#" class="noblue">Sign In</a></p>
+    </form>
+    <form class="login-form" onsubmit="login(); return false;">
+      <input type="text" placeholder="username" id="user2"/>
+      <input type="password" placeholder="password" id="password2"/>
+      <button>login</button>
+      <p class="message switcher">Not registered? <a href="#signup">Create an account</a></p>
+      <p class="message"><a href="forgot.html">Forgot your password?</a></p>
+    </form>
+  </div>
+</div>
+<script src="lib/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="></script>
+<script src="js/util.js"></script>
+<script src="js/login.js"></script>
+</body>
+</html>

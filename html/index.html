@@ -1,0 +1,172 @@
+<!doctype html>
+<html lang="en">
+<head>
+<?meta.html?>
+<?side-menu.html?>
+    <title>Budget Bot</title>
+</head>
+<body>
+
+<script>
+  window.fbAsyncInit = function() {
+    FB.init({
+      appId            : '264165663994086',
+      autoLogAppEvents : true,
+      xfbml            : true,
+      version          : 'v2.12'
+    });
+		FB.Event.subscribe('send_to_messenger', function(e) {
+			if(e.event === "clicked") {
+			  window.open("http://m.me/205308756748960","_blank");
+      	//window.open("https://m.me/budgetbotchat","_blank");
+			}
+		});
+  };
+
+  (function(d, s, id){
+     var js, fjs = d.getElementsByTagName(s)[0];
+     if (d.getElementById(id)) {return;}
+     js = d.createElement(s); js.id = id;
+     js.src = "https://connect.facebook.net/en_US/sdk.js";
+     fjs.parentNode.insertBefore(js, fjs);
+   }(document, 'script', 'facebook-jssdk'));
+</script>
+
+
+<div id="layout">
+    <!-- Menu toggle -->
+    <a href="#menu" id="menuLink" class="menu-link">
+        <!-- Hamburger icon -->
+        <span></span>
+    </a>
+
+    <div id="menu">
+        <div class="pure-menu">
+            <a class="pure-menu-heading" href="#top">Budget Bot</a>
+
+            <ul class="pure-menu-list">
+                <li class="pure-menu-item"><a href="#onthego" class="pure-menu-link">On the Go</a></li>
+                <li class="pure-menu-item"><a href="#balances" class="pure-menu-link">Balances</a></li>
+                <li class="pure-menu-item"><a href="#addexpense" class="pure-menu-link">Add Expense</a></li>
+                <li class="pure-menu-item"><a href="#explore" class="pure-menu-link">Explore</a></li>
+                <li class="pure-menu-item"><a href="#plan" class="pure-menu-link">Plan</a></li>
+                <li class="pure-menu-item"><a href="#view" class="pure-menu-link">Transactions</a></li>
+                <li class="pure-menu-item"><a href="#addtransfer" class="pure-menu-link">Add Transfer</a></li>
+                <li class="pure-menu-item"><a href="#account" class="pure-menu-link">Account</a></li>
+                <li class="pure-menu-item"><a href="help.html" class="pure-menu-link">Help</a></li>
+            </ul>
+        </div>
+    </div>
+
+    <div id="main">
+        <div class="header">
+            <h1>Budget Bot</h1>
+        </div>
+				<div class="content">
+          <h2 class="content-subhead"><a class='anchor' name='onthego'>Budget Bot on the Go</a></h2>
+          <p id="connect-messenger">You can easily record your expenses just by talking to Budget Bot on Messenger. Click below to get started.</p>
+            <!--messenger_app_id="264165663994086"
+  					page_id="274453546336424"-->
+          <div class="fb-send-to-messenger"
+						id="messenger-link"
+            messenger_app_id="264165663994086"
+            page_id="205308756748960"
+            color="blue"
+            size="xlarge">
+          </div>
+          <p>When your hands aren't free, you can also access Budget Bot on your <a href="https://skills-store.amazon.com/deeplink/dp/B07BJH5Z1B/">Alexa device</a>.</p>
+          <p>Find more information about <a href="help.html#onthego">Messenger and Alexa integrations</a>.</p>
+				</div>
+				<div class="content">
+            <h2 class="content-subhead"><a class='anchor' name='balances'>Balances
+            <sup><span data-tooltip="Add accounts (bank, credit, etc.) here and we'll help track the balances. (Mention the account name when entering purchases.) Currently supported on web and Messenger, but not on Alexa.">
+            <i class="fas fa-question-circle fa-sm"></i></span></sup>
+            </a></h2>
+						<div id="balance-content">Loading...</div>
+            <div id="warning1"></div>
+            <p>Find more information about <a href="help.html#balances">tracking account balances</a>.</p>
+				</div>
+				<div class="content">
+            <h2 class="content-subhead"><a class='anchor' name='addexpense'>Add Expense</a></h2>
+						<div id="add-expense">
+            <form class="pure-form-stacked" onsubmit="submit_expense(); return false;">
+                <fieldset>
+                <input id="description" autocomplete="off" type="text" data-lpignore="true" placeholder="Description"/>
+                <input id="amount" autocomplete="off" type="text" data-lpignore="true" placeholder="Amount"/>
+                <input id="category" autocomplete="off" class="category-sel" data-lpignore="true" type="text" placeholder="Category"/>
+                <select id="account-sel"></select>
+                <input id="submit-date" data-lpignore="true" type="text" class="datepicker" autocomplete="off" placeholder="Date (default today)"/>
+                <button class="pure-button pure-button-primary">Submit</button>
+                </fieldset>
+            </form>
+						<div id="add-expense-status"></div>
+            </div>
+				</div>
+				<div class="content">
+            <h2 class="content-subhead"><a class='anchor' name='explore'>Explore</a></h2>
+            <select id="pie-month-sel">
+            <option value="LAST7">Last 7 days</option>
+            </select>
+            <div id="pieChartContainer" height="500">
+              <canvas id="pieChart" width="500" height="500"></canvas>
+            </div>
+            <div id="warnings"></div>
+            <div id="welcome-explore"></div>
+				</div>
+				<div class="content">
+            <h2 class="content-subhead"><a class='anchor' name='plan'>Plan</a></h2>
+						<div id="goal-content">Loading...</div>
+            <form class="pure-form" onsubmit="add_goal(); return false;">
+            <fieldset>
+            <span>New plan:</span>
+            <input id="new-goal-cat" class="category-sel" autocomplete="off" type="text" data-lpignore="true" placeholder="Category"/>
+            <input id="new-goal-amt" autocomplete="off" type="text" data-lpignore="true" placeholder="Max Monthly Spending"/>
+            <button class="pure-button pure-button">Add Plan</button>
+            </fieldset>
+            </form>
+				</div>
+				<div class="content">
+            <h2 class="content-subhead"><a class='anchor' name='view'>Transactions</a></h2>
+            <select id="expenses-month-sel">
+            <option value="LAST7">Last 7 days</option>
+            </select>
+						<div id="expenses">Loading...</div>
+            <div id="welcome-expenses"></div>
+				</div>
+				<div class="content">
+            <h2 class="content-subhead"><a class='anchor' name='addtransfer'>Add Transfer</a></h2>
+						<div id="add-transfer">
+            <form class="pure-form-stacked" onsubmit="submit_transfer(); return false;">
+                <fieldset>
+                <input id="transfer-amount" autocomplete="off" type="text" data-lpignore="true" placeholder="Amount"/>
+                <label for="account-source">From:</label><select id="account-source"></select>
+                <label for="account-dest">To:</label><select id="account-dest"></select>
+                <input id="transfer-date" data-lpignore="true" type="text" class="datepicker" autocomplete="off" placeholder="Date (default today)"/>
+                <button class="pure-button pure-button-primary">Submit</button>
+                </fieldset>
+            </form>
+						<div id="add-transfer-status"></div>
+            </div>
+				</div>
+        <div class="content">
+            <h2 class="content-subhead"><a class='anchor' name='account'>Account</a></h2>
+          <p class="tall"><a href="#" id="logoutBtn" class="pure-button no-link">Log out</a>
+          <a href="change_pwd.html" class="pure-button no-link">Change password</a>
+          <a href="change_email.html" class="pure-button no-link">Change email</a></p>
+          <p>For support issues or feature suggestions, see if our <a href="help.html">help document</a> answers your question, or contact us at <a href="mailto:support@tellbudgetbot.com">support@tellbudgetbot.com</a>. Prospective investors or business partners can contact us at <a href="mailto:business@tellbudgetbot.com">business@tellbudgetbot.com</a>. Our <a href="privacy.html">Privacy Policy</a> and <a href="tos.html">Terms of Service</a> are also available for your reference.</p>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript" src="cordova.js"></script>
+<script src="lib/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="></script>
+<script src="lib/jquery-ui.js"></script>
+<link rel="stylesheet" href="lib/jquery-ui.css">
+<script src="lib/Chart.bundle.js"></script>
+
+<script src="js/util.js"></script>
+<script src="js/ui.js"></script>
+<script src="js/render.js?nocache=1"></script>
+
+</body>
+</html>

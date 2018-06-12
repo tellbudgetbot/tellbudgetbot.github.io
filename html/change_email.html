@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en">
+<head>
+<?meta.html?>
+    <link rel="stylesheet" type="text/css" href="css/login.css" />
+    <title>Budget Bot</title>
+</head>
+<body>
+<!-- source: https://codepen.io/colorlib/pen/rxddKy -->
+<div class="login-page">
+  <div class="form">
+    <form class="left" onsubmit="change_email(); return false;">
+      <p>Your current email address is <span id="old_email">(loading)</span></p>
+      <p>Enter your new email:</p>
+      <input type="text" placeholder="email" id="email"/>
+      <button>submit</button>
+      <p class="message"><a href="index.html">Cancel</a></p>
+    </form>
+  </div>
+</div>
+<script src="lib/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="></script>
+<script src="js/util.js"></script>
+<script>
+var user;
+var token;
+function change_email() {
+  var email = document.getElementById("email").value;
+  $.post(host+"/change_email", {"token":token,"email":email}, function( data ) {
+    if(data.error === undefined ) {
+      alert("Email updated." + (data.message || ""));
+      document.location.href="index.html";
+    } else {
+      alert(data.error);
+    }
+  },"json").fail(function() {
+    alert("Sorry, an error occurred.");
+  });
+}
+function preinit() {
+  user = localStorage.getItem("user");
+  token = localStorage.getItem("token");
+  if(user === null || token == null) {
+    document.location.href = "login.html";
+  }
+}
+function setup() {
+  $.post(host+"/get_email", {"token":token}, function( data ) {
+    if(data.email ) {
+      document.getElementById("old_email").innerText = data.email;
+    } else {
+      document.getElementById("old_email").innerText = "unknown";
+    }
+  },"json").fail(function() {
+    document.getElementById("old_email").innerText = "unknown";
+  });
+}
+preinit();
+setup();
+</script>
+</body>
+</html>
