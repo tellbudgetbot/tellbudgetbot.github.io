@@ -22,36 +22,6 @@ function getMonthStart() {
   var start = new Date(now.getFullYear(), now.getMonth(), 1, 0, 0,0);
   return start.getTime() / 1000.0;
 }
-function auth(){
-  return {"token": token};
-}
-function parseDollarNum(num) {
-  var sign = 1;
-  if(num.length == 0){
-    return NaN;
-  }
-  if(num.charAt(0)=="-") {
-    num = num.substr(1);
-    sign = -1;
-  }
-  if(num.charAt(0)=="$") {
-    num = num.substr(1);
-  }
-  num = num.replace(/,/g,"");
-  if(num.length == 0) {
-    return NaN;
-  }
-  return sign * Number(num);
-}
-function isNum(num){
-  return !isNaN(Number(num));
-}
-function isDollarNum(num) {
-  return !isNaN(parseDollarNum(num));
-}
-function starts_with(str,pref){
-  return str.length >= pref.length && str.substr(0,pref.length) == pref;
-}
 
 function render_account_heading() {
   var thead = document.createElement("thead");
@@ -248,39 +218,6 @@ function render_add_account_btn(){
   btn.addEventListener("click", add_account);
   p.appendChild(btn);
   return p;
-}
-
-function render_account_sel(accountsel, accounts){
-  var cNode = null;
-  var val = null;
-  if(accountsel) {
-    cNode = accountsel.cloneNode(false);
-    val = accountsel.value;
-  } else {
-    cNode = document.createElement("select");
-  }
-  var isValid = false;
-  for(var i = 0; i < accounts.length; i++) {
-    var option = document.createElement("option");
-    option.value = accounts[i][0];
-    if(accounts[i][0] == val) {
-      isValid = true;
-    }
-    option.innerText = accounts[i][1];
-    cNode.appendChild(option);
-  }
-  if(accounts.length > 0) {
-    $(cNode).show();
-  } else {
-    $(cNode).hide();
-  }
-  if(val && isValid) {
-    cNode.value = val;
-  }
-  if(accountsel) {
-    accountsel.parentNode.replaceChild(cNode, accountsel);
-  }
-  return cNode;
 }
 
 function render_goal_heading() {
@@ -564,6 +501,7 @@ function render_balance_response(raw_data) {
   node.parentNode.replaceChild(cNode, node);
 
   state.accounts = data;
+  localStorage.setItem("accounts",JSON.stringify(data));
 
   var options = "";
   var suggest = "";
@@ -1088,35 +1026,8 @@ function get_cat(cat_sums, cat){
 
 function submit_expense() {
   var data = auth();
-  var desc = document.getElementById("description").value;
-  data["description"]=desc;
-  var amt_el = document.getElementById("amount");
-  var amt = amt_el.value;
-  if(amt !== "") {
-    if(isDollarNum(amt)) {
-      data["amount"] = parseDollarNum(amt);
-    } else {
-      $(amt_el).addClass("error");
-      return;
-    }
-  }
-  $(amt_el).removeClass("error");
-  var cat = document.getElementById("category").value;
-  if(cat.length > 0) {
-    data["category"]=cat;
-  }
-  var acct = document.getElementById("account-sel").value;
-  if(acct && acct.length > 0) {
-    data["account"]=document.getElementById("account-sel").value;
-  }
-  var date = $("#submit-date").datepicker( "getDate" );
-  if(date) {
-    //TODO: timezone problems
-    var noon = new Date(date.getFullYear(), date.getMonth(), date.getDate(), 12);
-    data["timestamp"] = noon.getTime() / 1000;
-    data["timezone"] = noon.getTimezoneOffset();
-  }
-  if(desc.length > 0 || amt.length > 0) {
+  get_expense_data(data);
+  if(data["description"] || data["amount"]) {
     var statusEl = document.getElementById("add-expense-status");
     function submit_expense_response(data) {
       if(data && data.error) {
@@ -1234,6 +1145,13 @@ function init() {
 }
 
 function setup() {
+  check_online(function(online){
+    if(!online) {
+      document.location.href="offline.html";
+    } else {
+      submit_pending_expenses();
+    }
+  });
   var dt = auth();
   dt["timezone"] = new Date().getTimezoneOffset();
   $.ajax({
@@ -1303,7 +1221,7 @@ function setup() {
 }
 
 function logout() {
-  localStorage.clear();
+  localStorage.removeItem("token");
   document.location.href="login.html";
 }
 
@@ -1313,10 +1231,55 @@ function preinit() {
   if(user === null || token == null) {
     document.location.href = "login.html";
   } else {
-    document.getElementById("messenger-link").setAttribute("data-ref",token);
-    window.onload = init;
+    if(document.location.href.indexOf("tellbudgetbot.com")===-1) {
+      //local mode
+      var mlink = document.getElementById("messenger-link");
+      mlink.parentNode.removeChild(mlink);
+      document.getElementById("connect-messenger").innerHTML = 'You can easily record your expenses just by talking to <a href="http://m.me/205308756748960">Budget Bot on Messenger</a>.';
+    } else {
+      document.getElementById("messenger-link").setAttribute("data-ref",token);
+    }
   }
 }
 preinit();
 
-var user=null;
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
+var app = {
+    // Application Constructor
+    initialize: function() {
+        document.addEventListener('deviceready', this.onDeviceReady.bind(this), false);
+    },
+
+    // deviceready Event Handler
+    //
+    // Bind any cordova events here. Common events are:
+    // 'pause', 'resume', etc.
+    onDeviceReady: function() {
+        this.receivedEvent('deviceready');
+        init();
+    },
+
+    // Update DOM on a Received Event
+    receivedEvent: function(id) {
+        var parentElement = document.getElementById(id);
+    }
+};
+
+app.initialize();
