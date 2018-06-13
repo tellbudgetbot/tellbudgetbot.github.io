@@ -1250,7 +1250,7 @@ function preinit() {
     } else {
       document.getElementById("messenger-link").setAttribute("data-ref",token);
     }
-    window.onload = init();
+    window.onload = init;
   }
 }
 preinit();
