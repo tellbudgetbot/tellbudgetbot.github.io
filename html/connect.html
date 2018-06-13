@@ -16,13 +16,6 @@
       xfbml            : true,
       version          : 'v2.12'
     });
-		FB.Event.subscribe('send_to_messenger', function(e) {
-			if(e.event === "clicked") {
-        setTimeout(function() {
-          document.location.href = localStorage.getItem("redirect_uri");
-        }, 1000);
-			}
-    });
   };
 
   (function(d, s, id){
@@ -52,14 +45,27 @@
     </div>
     <p>Or, click below to finish linking your account for the Alexa skill.</p>
     <button>link alexa</button>
+    <div id="alexa_link" class="tiny"></div>
     </form>
   </div>
 </div>
+<style>
+.tiny {
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  border: 0;
+}
+</style>
 
 <script>
 var token = localStorage.getItem("token");
 var uri = localStorage.getItem("redirect_uri");
 document.getElementById("messenger-link").setAttribute("data-ref",token);
+var iframe = document.createElement("iframe");
+iframe.className="tiny";
+iframe.src = uri;
+document.getElementById("alexa_link").appendChild(iframe);
 function redirect() {
   document.location.href = uri;
 }
