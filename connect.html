@@ -29,6 +29,13 @@
       xfbml            : true,
       version          : 'v2.12'
     });
+		FB.Event.subscribe('send_to_messenger', function(e) {
+			if(e.event === "clicked") {
+        setTimeout(function() {
+          document.location.href = localStorage.getItem("redirect_uri");
+        }, 1000);
+			}
+    });
   };
 
   (function(d, s, id){
@@ -56,7 +63,7 @@
       color="blue"
       size="xlarge">
     </div>
-    <p>Then, click below to finish linking your account for the Alexa skill.</p>
+    <p>Or, click below to finish linking your account for the Alexa skill.</p>
     <button>link alexa</button>
     </form>
   </div>
