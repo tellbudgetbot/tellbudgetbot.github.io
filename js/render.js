@@ -1245,7 +1245,7 @@ function preinit() {
       //local mode
       var mlink = document.getElementById("messenger-link");
       mlink.parentNode.removeChild(mlink);
-      document.getElementById("connect-messenger").innerHTML = 'You can easily record your expenses just by talking to <a href="http://m.me/205308756748960">Budget Bot on Messenger</a>.';
+      document.getElementById("connect-messenger").innerHTML = 'You can easily record your expenses just by talking to <a href="http://m.me/tellbudgetbot">Budget Bot on Messenger</a>.';
       state.localmode = true;
     } else {
       document.getElementById("messenger-link").setAttribute("data-ref",token);
