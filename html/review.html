@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en">
+<head>
+<?meta.html?>
+    <link rel="stylesheet" type="text/css" href="css/login.css" />
+    <title>Budget Bot</title>
+</head>
+<body>
+<div class="login-page">
+  <div class="form" onsubmit="redirect(); return false;">
+    <form class="left">
+    <p>That's great to hear! Would you please share your experience with other budgeters by leaving a quick review on Amazon? Your feedback will help us make Budget Bot better!</p>
+    <button>Yes, I'll help!</button>
+  </div>
+</div>
+
+<script src="lib/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="></script>
+<script>
+function redirect() {
+  document.location.href="https://www.amazon.com/review/create-review?asin=B07BJH5Z1B";
+}
+$.ajax({
+    type: "POST",
+    url: "https://docs.google.com/forms/u/6/d/e/1FAIpQLSclSsR42a67T93KIJFVP_P_1eokuyClzOIye2m3FWndHoX6cQ/formResponse",
+    data: {"entry.1144793319":document.location.search.substr(1)}
+});
+</script>
+</body>
+</html>

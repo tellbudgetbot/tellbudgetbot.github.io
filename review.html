@@ -19,44 +19,24 @@
     <title>Budget Bot</title>
 </head>
 <body>
-
 <div class="login-page">
-  <div class="form" onsubmit="reset_pwd(); return false;">
+  <div class="form" onsubmit="redirect(); return false;">
     <form class="left">
-    <p>Enter your new password</p>
-    <input type="password" placeholder="enter password" id="pass1"/>
-    <input type="password" placeholder="repeat password" id="pass2"/>
-      <button>submit</button>
-    </form>
+    <p>That's great to hear! Would you please share your experience with other budgeters by leaving a quick review on Amazon? Your feedback will help us make Budget Bot better!</p>
+    <button>Yes, I'll help!</button>
   </div>
 </div>
+
 <script src="lib/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="></script>
-<script src="js/util.js"></script>
 <script>
-function reset_pwd() {
-  var pass1 = document.getElementById("pass1").value;
-  var pass2 = document.getElementById("pass2").value;
-  if(pass1!==pass2) {
-    alert("Passwords do not match. Please enter the same password twice.");
-    return;
-  }
-  var check = passwordComplexityCheck(pass1);
-  if(check) {
-    alert(check);
-    return;
-  }
-  var token = document.location.search.substr(1);
-  $.post(host+"/reset_password", {"reset_token":token,"password":pass1}, function( data ) {
-    if(data.error === undefined ) {
-      alert("Password updated. Please log in.");
-      document.location.href="login.html";
-    } else {
-      alert(data.error);
-    }
-  },"json").fail(function() {
-    alert("Network error");
-  });
+function redirect() {
+  document.location.href="https://www.amazon.com/review/create-review?asin=B07BJH5Z1B";
 }
+$.ajax({
+    type: "POST",
+    url: "https://docs.google.com/forms/u/6/d/e/1FAIpQLSclSsR42a67T93KIJFVP_P_1eokuyClzOIye2m3FWndHoX6cQ/formResponse",
+    data: {"entry.1144793319":document.location.search.substr(1)}
+});
 </script>
 </body>
 </html>
