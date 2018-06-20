@@ -13,7 +13,8 @@ var state = {
   "accounts": [],
   "categories": [],
   "userinfo": null,
-  "localmode": false
+  "localmode": false,
+  "deleted_keys": {}
 };
 function getCurrentMonth() {
   return MONTH_NAMES[new Date().getMonth()];
@@ -43,6 +44,7 @@ function render_account_heading() {
 }
 
 function render_account(datai) {
+  var key = datai[0];
   var tr = document.createElement("tr");
   var acct_td = document.createElement("td");
   var balance_td = document.createElement("td");
@@ -144,7 +146,8 @@ function render_account(datai) {
     if(confirm("CAUTION: Are you sure you want to delete this account? All budget items currently filed to this account will no longer be associated with it.")) {
       if(confirm("Please confirm that you want to delete the following account: " + datai[1])) {
         var data = auth();
-        data["accountid"] = datai[0];
+        data["accountid"] = key;
+        state.deleted_keys[key] = true;
         tr.parentNode.removeChild(tr);
         $.ajax({
             type: "POST",
@@ -489,7 +492,9 @@ function render_balance_response(raw_data) {
     var tbody = document.createElement("tbody");
 
     for(var i = 0; i < data.length; i++) {
-      tbody.appendChild(render_account(data[i]));
+      if(!state.deleted_keys[data[i][0]]) {
+        tbody.appendChild(render_account(data[i]));
+      }
     }
     table.appendChild(tbody);
     cNode.appendChild(table);
@@ -626,6 +631,7 @@ function make_account_sel() {
 function render_expense(datai) {
   var time = dateFromTimestamp(datai[1]["timestamp"]);
   var timestr = format_date(time);
+  var key = datai[0];
   var description = datai[1]["description"] || "(no description)";
   var category = datai[1]["category_name"] || datai[1]["category"] || "(uncategorized)";
   var account = datai[1]["account_name"] || "(no account)";
@@ -694,7 +700,8 @@ function render_expense(datai) {
   del.addEventListener("click", function() {
     if(confirm("Are you sure you want to delete this budget item?")) {
       var data = auth();
-      data["key"] = datai[0];
+      data["key"] = key;
+      state.deleted_keys[key] = true;
       outer.parentNode.removeChild(outer);
       $.ajax({
           type: "POST",
@@ -801,7 +808,9 @@ function render_expense_date(clump, datestr) {
   outer.appendChild(line);
 
   for(var i =0; i < clump.length; i++) {
-    outer.appendChild(render_expense(clump[i]));
+    if(!state.deleted_keys[clump[i][0]]) {
+      outer.appendChild(render_expense(clump[i]));
+    }
   }
   return outer;
 }
