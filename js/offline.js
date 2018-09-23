@@ -99,7 +99,7 @@ function setup() {
     $( ".datepicker" ).datepicker();
   } );
   var accountsel = document.getElementById("account-sel");
-  render_account_sel(accountsel, get_accounts());
+  render_account_sel(accountsel, get_accounts(), []);
   $( ".category-sel" ).autocomplete({"source": get_categories()});
   render_pending();
 }

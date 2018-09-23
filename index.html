@@ -142,8 +142,14 @@
 				</div>
 				<div class="content">
             <h2 class="content-subhead"><a class='anchor' name='explore'>Explore</a></h2>
+            Explore transactions made during
             <select id="pie-month-sel">
-            <option value="LAST7">Last 7 days</option>
+            <option value="LAST7">the last 7 days</option>
+            </select>
+            involving
+            <select id="pie-account-sel">
+            <option value="{ALL_ACCTS}">any account</option>
+            <option value="{NO_ACCT}">(no account)</option>
             </select>
             <div id="pieChartContainer" height="500">
               <canvas id="pieChart" width="500" height="500"></canvas>
@@ -165,8 +171,14 @@
 				</div>
 				<div class="content">
             <h2 class="content-subhead"><a class='anchor' name='view'>Transactions</a></h2>
+            View and edit transactions made during
             <select id="expenses-month-sel">
-            <option value="LAST7">Last 7 days</option>
+            <option value="LAST7">the last 7 days</option>
+            </select>
+            involving
+            <select id="expenses-account-sel">
+            <option value="{ALL_ACCTS}">any account</option>
+            <option value="{NO_ACCT}">(no account)</option>
             </select>
 						<div id="expenses">Loading...</div>
             <div id="welcome-expenses"></div>
@@ -201,9 +213,9 @@
 <link rel="stylesheet" href="lib/jquery-ui.css">
 <script src="lib/Chart.bundle.js"></script>
 
-<script src="js/util.js"></script>
+<script src="js/util.js?nocache=1"></script>
 <script src="js/ui.js"></script>
-<script src="js/render.js?nocache=2"></script>
+<script src="js/render.js?nocache=3"></script>
 
 </body>
 </html>

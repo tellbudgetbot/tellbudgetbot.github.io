@@ -1,7 +1,10 @@
 var user=null;
 var token=null;
 var categoryPieChart = null;
-var ACCT_PREFIX="__acct:";
+var ACCT_PREFIX = "__acct:";
+var ALL_ACCTS = "{ALL_ACCTS}";
+var NO_ACCT = "{NO_ACCT}";
+var EXTRA_ACCOUNT_OPTIONS = [[ALL_ACCTS,"any account"],null,[NO_ACCT,"(no account)"]]
 var MONTH_NAMES = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
 
 var state = {
@@ -518,11 +521,19 @@ function render_balance_response(raw_data) {
   }
   document.getElementById("warning1").innerText=suggest;
   var accountsel = document.getElementById("account-sel");
-  render_account_sel(accountsel, data);
+  render_account_sel(accountsel, data, []);
   accountsel = document.getElementById("account-source");
-  render_account_sel(accountsel, data);
+  render_account_sel(accountsel, data, []);
   accountsel = document.getElementById("account-dest");
-  render_account_sel(accountsel, data);
+  render_account_sel(accountsel, data, []);
+
+  accountsel = document.getElementById("expenses-account-sel");
+  var eaccountsel = render_account_sel(accountsel, data, EXTRA_ACCOUNT_OPTIONS);
+  eaccountsel.onchange = expense_month_selector_changed;
+
+  accountsel = document.getElementById("pie-account-sel");
+  var paccountsel = render_account_sel(accountsel, data, EXTRA_ACCOUNT_OPTIONS);
+  paccountsel.onchange = pie_month_selector_changed;
 };
 
 function render_balances(callback) {
@@ -621,7 +632,7 @@ function make_input() {
 }
 function make_account_sel() {
   var outer = document.createElement("div");
-  var select = render_account_sel(null, state.accounts);
+  var select = render_account_sel(null, state.accounts, []);
   select.className = "raw-input";
   outer.appendChild(select);
   outer.raw = select;
@@ -852,7 +863,7 @@ function render_month_selector(sel, extra_lasts) {
   for(var i = 0; i < lasts.length; i++) {
     var option = document.createElement("option");
     option.value = "LAST"+lasts[i];
-    option.innerText = "Last " + lasts[i] + " days";
+    option.innerText = "the last " + lasts[i] + " days";
     cNode.appendChild(option);
   }
 
@@ -882,7 +893,11 @@ function render_pie() {
       return;
     }
     state.last_pie_change = raw_data.last_change;
-    var data = raw_data.items;
+
+    var unfiltered_data = raw_data.items;
+    var acctFilter = document.getElementById("pie-account-sel").value;
+    var data = applyFilters(unfiltered_data, acctFilter);
+
     var cat_spend = {};
     var cat_earn = {};
     var cats = [];
@@ -949,10 +964,10 @@ function render_pie() {
         } else {
           $("#pieChartContainer").hide();
         }
-        document.getElementById("welcome-explore").innerText = "During this period your income totaled " + format_dollars(total_income) + " and your spending totaled " + format_dollars(total_expenses) + "." + income_cats;
+        document.getElementById("welcome-explore").innerText = "For this range, your income totaled " + format_dollars(total_income) + " and your spending totaled " + format_dollars(total_expenses) + "." + income_cats;
       } else {
         $("#pieChartContainer").hide();
-        document.getElementById("welcome-explore").innerText = "Welcome to Budget Bot! At the moment, there are no expenses for the time period selected, but once you enter in some expenses, you'll be able to visualize your spending here.";
+        document.getElementById("welcome-explore").innerText = "Welcome to Budget Bot! At the moment, there are no expenses for the range selected, but once you enter in some expenses, you'll be able to visualize your spending here.";
       }
     }
   }
@@ -963,13 +978,41 @@ function render_pie() {
   get_expenses(dt, sel, render_pie_response);
 }
 
+function checkFilters(datai, acctFilter) {
+  if(acctFilter === ALL_ACCTS) {
+    return true;
+  }
+  if(acctFilter === datai["account"]) {
+    return true;
+  }
+  if(ACCT_PREFIX + acctFilter === datai["category"]) {
+    return true;
+  }
+  if(acctFilter === NO_ACCT && !datai["account"]) {
+    return true;
+  }
+}
+
+function applyFilters(unfiltered_data, acctFilter) {
+  var data = [];
+  for(var i = 0; i < unfiltered_data.length; i++) {
+    if(checkFilters(unfiltered_data[i][1], acctFilter)) {
+      data.push(unfiltered_data[i]);
+    }
+  }
+  return data;
+}
+
 function render_expenses(callback) {
   function render_expenses_response(raw_data) {
     if(raw_data.cached) {
       return;
     }
     state.last_expense_change = raw_data.last_change;
-    var data = raw_data.items;
+    var unfiltered_data = raw_data.items;
+
+    var acctFilter = document.getElementById("expenses-account-sel").value;
+    var data = applyFilters(unfiltered_data, acctFilter);
 
     if(data.length > 0) {
       document.getElementById('welcome-expenses').innerText="";
@@ -993,7 +1036,7 @@ function render_expenses(callback) {
       node.parentNode.replaceChild(cNode ,node);
     } else {
       document.getElementById("expenses").innerText = "";
-      document.getElementById("welcome-expenses").innerText = "There aren't any expenses for the time period selected.";
+      document.getElementById("welcome-expenses").innerText = "There aren't any transactions for the range selected.";
     }
     document.getElementById("expenses").style.opacity=1;
     if(callback) {

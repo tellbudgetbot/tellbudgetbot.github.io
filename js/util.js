@@ -49,7 +49,10 @@ function auth(){
   return {"token": token};
 }
 
-function render_account_sel(accountsel, accounts){
+function render_account_sel(accountsel, accounts, extraOptions){
+  if(!extraOptions) {
+    extraOptions = [];
+  }
   var cNode = null;
   var val = null;
   if(accountsel) {
@@ -59,14 +62,28 @@ function render_account_sel(accountsel, accounts){
     cNode = document.createElement("select");
   }
   var isValid = false;
-  for(var i = 0; i < accounts.length; i++) {
+  function addOption(opt) {
     var option = document.createElement("option");
-    option.value = accounts[i][0];
-    if(accounts[i][0] == val) {
+    option.value = opt[0];
+    if(opt[0] == val) {
       isValid = true;
     }
-    option.innerText = accounts[i][1];
+    option.innerText = opt[1];
     cNode.appendChild(option);
+  }
+  for(var idx = 0; idx < extraOptions.length; idx++) {
+    if(extraOptions[idx] === null) {
+      // add rest of options at end
+      idx++;
+      break;
+    }
+    addOption(extraOptions[idx]);
+  }
+  for(var i = 0; i < accounts.length; i++) {
+    addOption(accounts[i]);
+  }
+  for(; idx < extraOptions.length; idx++) {
+    addOption(extraOptions[idx]);
   }
   if(accounts.length > 0) {
     $(cNode).show();
