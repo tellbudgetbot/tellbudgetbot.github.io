@@ -928,6 +928,7 @@ function render_pie() {
     } else {
       document.getElementById("warnings").innerText = "";
     }
+    var empty_message = "Welcome to Budget Bot! At the moment, there are no expenses for the range selected, but once you enter in some expenses, you'll be able to visualize your spending here.";
     if(categoryPieChart) {
       if(cats.length > 0) {
         categoryPieChart.data.labels.length = 0;
@@ -964,10 +965,14 @@ function render_pie() {
         } else {
           $("#pieChartContainer").hide();
         }
-        document.getElementById("welcome-explore").innerText = "For this range, your income totaled " + format_dollars(total_income) + " and your spending totaled " + format_dollars(total_expenses) + "." + income_cats;
+        if(total_expenses > 0 || total_income > 0) {
+          document.getElementById("welcome-explore").innerText = "For this range, your income totaled " + format_dollars(total_income) + " and your spending totaled " + format_dollars(total_expenses) + "." + income_cats;
+        } else {
+          document.getElementById("welcome-explore").innerText = empty_message;
+        }
       } else {
         $("#pieChartContainer").hide();
-        document.getElementById("welcome-explore").innerText = "Welcome to Budget Bot! At the moment, there are no expenses for the range selected, but once you enter in some expenses, you'll be able to visualize your spending here.";
+        document.getElementById("welcome-explore").innerText = empty_message;
       }
     }
   }
