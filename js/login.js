@@ -2,7 +2,9 @@ $('.switcher a').click(function(){
    $('form').animate({height: "toggle", opacity: "toggle"}, 50);
 });
 function preinit() {
-  if(document.location.hash.indexOf("signup")!==-1 || window.location.search.indexOf("alexa")!==-1){
+  if(document.location.hash.indexOf("signup")!==-1 ||
+     window.location.search.indexOf("alexa")!==-1 ||
+     window.location.search.indexOf("bixby")!==-1) {
     $('form').animate({height: "toggle", opacity: "toggle"}, 50);
   }
 }
