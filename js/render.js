@@ -17,7 +17,8 @@ var state = {
   "categories": [],
   "userinfo": null,
   "localmode": false,
-  "deleted_keys": {}
+  "deleted_keys": {},
+  "export_pending": false
 };
 function getCurrentMonth() {
   return MONTH_NAMES[new Date().getMonth()];
@@ -1246,6 +1247,7 @@ function setup() {
       }
   });
   document.getElementById("logoutBtn").onclick = logout;
+  document.getElementById("exportBtn").onclick = exportCsv;
 
   $( function() {
     $( ".datepicker" ).datepicker();
@@ -1291,6 +1293,41 @@ function logout() {
   localStorage.removeItem("token");
   document.location.href="login.html";
 }
+
+function exportCsv() {
+  if(state.export_pending) {
+    alert("An export is already in process. Please wait.");
+    return;
+  }
+  var msg = "Your transactions will be exported in CSV format (compatible with Excel) and sent to the email associated with the account. Proceed?";
+  if(confirm(msg)) {
+    state.export_pending = true;
+    $.ajax({
+        type: "POST",
+        url: host+"/export_csv",
+        data: auth(),
+        dataType: "json",
+        success: function(data) {
+          state.export_pending = false;
+          if(data.error!==undefined) {
+            console.log(data.error);
+            alert(data.error);
+          } else {
+            if(state.userinfo && state.userinfo.email) {
+              email = state.userinfo.email;
+            }
+            alert("Export to " + data.email + " has finished. Please check your email.");
+          }
+        },
+        error: function(r,s,e) {
+          state.export_pending = false;
+          console.log(e);
+          alert("Sorry, a network error occurred.");
+        }
+    });
+  }
+}
+
 
 function preinit() {
   user = localStorage.getItem("user");
