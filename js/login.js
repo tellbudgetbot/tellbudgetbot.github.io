@@ -2,7 +2,9 @@ $('.switcher a').click(function(){
    $('form').animate({height: "toggle", opacity: "toggle"}, 50);
 });
 function preinit() {
-  if(document.location.hash.indexOf("signup")!==-1 || window.location.search.indexOf("alexa")!==-1){
+  if(document.location.hash.indexOf("signup")!==-1 ||
+     window.location.search.indexOf("alexa")!==-1 ||
+     window.location.search.indexOf("bixby")!==-1) {
     $('form').animate({height: "toggle", opacity: "toggle"}, 50);
   }
 }
@@ -63,16 +65,21 @@ function signup(){
 function startsWith(str,start){
   return str.length >= start.length && str.substr(0,start.length) == start;
 }
-function is_valid_redirect(redirect_uri) {
-  var uris = ["https://pitangui.amazon.com/spa/skill/account-linking-status.html?vendorId=M1MY1UQEEEFTLT",
-              "https://layla.amazon.com/spa/skill/account-linking-status.html?vendorId=M1MY1UQEEEFTLT",
-              "https://alexa.amazon.co.jp/spa/skill/account-linking-status.html?vendorId=M1MY1UQEEEFTLT"];
-  for(var i = 0;  i < uris.length; i++) {
-    if(redirect_uri == uris[i]){
-      return true;
+function is_valid_redirect(redirect_uri, client_id) {
+  if(client_id == "alexa") {
+    var uris = ["https://pitangui.amazon.com/spa/skill/account-linking-status.html?vendorId=M1MY1UQEEEFTLT",
+                "https://layla.amazon.com/spa/skill/account-linking-status.html?vendorId=M1MY1UQEEEFTLT",
+                "https://alexa.amazon.co.jp/spa/skill/account-linking-status.html?vendorId=M1MY1UQEEEFTLT"];
+    for(var i = 0;  i < uris.length; i++) {
+      if(redirect_uri == uris[i]){
+        return true;
+      }
     }
   }
-  if(startsWith(redirect_uri, "https://facebook.com/messenger_platform/account_linking/")) {
+  if(client_id == "messenger" && startsWith(redirect_uri, "https://facebook.com/messenger_platform/account_linking/")) {
+    return true;
+  }
+  if(client_id == "bixby" && startsWith(redirect_uri, "https://budgetbot-budgetbot.oauth.aibixby.com")) {
     return true;
   }
   return false;
@@ -82,13 +89,13 @@ function redir(user,data){
   localStorage.setItem("userid",data.userid);
   localStorage.setItem("token",data.token);
   if(window.location.search.indexOf("alexa")!==-1){
-		var url = window.location.href;
-		var state = getParameterByName("state", url);
-		var client_id = getParameterByName("client_id", url);
-		var response_type = getParameterByName("response_type", url);
-		var scope = getParameterByName("scope", url);
-		var redirect_uri = getParameterByName("redirect_uri", url);
-    if(client_id == "alexa" && is_valid_redirect(redirect_uri)) {
+    var url = window.location.href;
+    var state = getParameterByName("state", url);
+    var client_id = getParameterByName("client_id", url);
+    var response_type = getParameterByName("response_type", url);
+    var scope = getParameterByName("scope", url);
+    var redirect_uri = getParameterByName("redirect_uri", url);
+    if(client_id == "alexa" && is_valid_redirect(redirect_uri, client_id)) {
       var uri = redirect_uri+"#state="+state+"&access_token="+data.token+"&token_type=Bearer";
       localStorage.setItem("redirect_uri", uri);
       function do_redirect() {
@@ -99,12 +106,21 @@ function redir(user,data){
       return;
     }
   } else if(window.location.search.indexOf("messenger")!==-1) {
-		var url = window.location.href;
-		var link_token = getParameterByName("account_linking_token", url);
-		var client_id = getParameterByName("client_id", url);
-		var redirect_uri = getParameterByName("redirect_uri", url);
-    if(client_id == "messenger" && is_valid_redirect(redirect_uri)) {
+    var url = window.location.href;
+    var link_token = getParameterByName("account_linking_token", url);
+    var client_id = getParameterByName("client_id", url);
+    var redirect_uri = getParameterByName("redirect_uri", url);
+    if(client_id == "messenger" && is_valid_redirect(redirect_uri, client_id)) {
       document.location.href=redirect_uri + "&authorization_code="+data.token;
+      return;
+    }
+  } else if(window.location.search.indexOf("bixby")!==-1) {
+    var url = window.location.href;
+    var state = getParameterByName("state", url);
+    var client_id = getParameterByName("client_id", url);
+    var redirect_uri = getParameterByName("redirect_uri", url);
+    if(client_id == "bixby" && is_valid_redirect(redirect_uri, client_id)) {
+      document.location.href=redirect_uri + "?grant_type=authorization_code&code="+data.token+"&state="+state;
       return;
     }
   }
