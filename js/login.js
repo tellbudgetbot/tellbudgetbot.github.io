@@ -120,7 +120,11 @@ function redir(user,data){
     var client_id = getParameterByName("client_id", url);
     var redirect_uri = getParameterByName("redirect_uri", url);
     if(client_id == "bixby" && is_valid_redirect(redirect_uri, client_id)) {
-      document.location.href=redirect_uri + "?grant_type=authorization_code&code="+data.token+"&state="+state;
+      function do_redirect() {
+        document.location.href=redirect_uri + "?grant_type=authorization_code&code="+data.token+"&state="+state;
+      }
+      $.post(host+"/bixby_event", {"token":data.token,"event":"bixby_link"}, do_redirect)
+       .fail(do_redirect);
       return;
     }
   }
