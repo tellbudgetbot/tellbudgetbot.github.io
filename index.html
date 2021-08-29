@@ -52,24 +52,16 @@
       appId            : '264165663994086',
       autoLogAppEvents : true,
       xfbml            : true,
-      version          : 'v2.12'
+      version          : 'v11.0'
     });
-		FB.Event.subscribe('send_to_messenger', function(e) {
-			if(e.event === "clicked") {
-			  window.open("http://m.me/tellbudgetbot","_blank");
-			}
-		});
+    FB.Event.subscribe('send_to_messenger', function(e) {
+        if(e.event === "clicked") {
+          window.open("http://m.me/tellbudgetbot","_blank");
+        }
+    });
   };
-
-  (function(d, s, id){
-     var js, fjs = d.getElementsByTagName(s)[0];
-     if (d.getElementById(id)) {return;}
-     js = d.createElement(s); js.id = id;
-     js.src = "https://connect.facebook.net/en_US/sdk.js";
-     fjs.parentNode.insertBefore(js, fjs);
-   }(document, 'script', 'facebook-jssdk'));
 </script>
-
+<script async defer crossorigin="anonymous" src="https://connect.facebook.net/en_US/sdk.js"></script>
 
 <div id="layout">
     <!-- Menu toggle -->
