@@ -13,7 +13,7 @@
     <meta name="theme-color" content="#ffffff">
     <meta name="format-detection" content="telephone=no">
     <meta name="msapplication-tap-highlight" content="no">
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self' data: gap: https://ssl.gstatic.com 'unsafe-eval' 'unsafe-inline' https://api.tellbudgetbot.com http://dev.tellbudgetbot.com:8080 https://connect.facebook.net/ https://www.google.com/recaptcha/api.js https://www.gstatic.com/ https://docs.google.com https://www.googletagmanager.com https://www.youtube.com https://www.google-analytics.com/; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com/; font-src https://fonts.gstatic.com; frame-src https://www.youtube.com/ https://www.facebook.com/ http://staticxx.facebook.com/ https://www.google.com/ https://tellbudgetbot.com https://pitangui.amazon.com https://layla.amazon.com https://alexa.amazon.co.jp; media-src *; img-src 'self' data: content: https://www.facebook.com/ https://www.google-analytics.com;">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self' data: gap: https://ssl.gstatic.com 'unsafe-eval' 'unsafe-inline' https://api.tellbudgetbot.com http://dev.tellbudgetbot.com:8080 https://msgr.tellbudgetbot.com:444 https://connect.facebook.net/ https://www.google.com/recaptcha/api.js https://www.gstatic.com/ https://docs.google.com https://www.googletagmanager.com https://www.youtube.com https://www.google-analytics.com/; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com/; font-src https://fonts.gstatic.com; frame-src https://www.youtube.com/ https://www.facebook.com/ http://staticxx.facebook.com/ https://www.google.com/ https://tellbudgetbot.com https://pitangui.amazon.com https://layla.amazon.com https://alexa.amazon.co.jp; media-src *; img-src 'self' data: content: https://www.facebook.com/ https://www.google-analytics.com;">
     <!-- Global site tag (gtag.js) - Google Analytics -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=UA-121603004-1"></script>
     <script>
@@ -47,12 +47,14 @@
       <div class="checkbox-wrapper"><label><input type="checkbox" id="check13"/>I am at least 13 years old.</label></div>
       <div class="checkbox-wrapper"><label><input type="checkbox" id="checkTOS"/>I agree to the <a href="tos.html" class="noblue">Terms of Service</a> and the processing of my data in accordance with the <a href="privacy.html" class="noblue">Privacy Policy</a>.</label></div>
       <div class="checkbox-wrapper"><label><input type="checkbox" id="checkEmail"/>I would like to receive occasional emails about new features, products, and deals. (optional)</label></div>
+      <p class="left hidden link_msg"></p>
       <button>create</button>
       <p class="message switcher">Already registered? <a href="#" class="noblue">Sign In</a></p>
     </form>
     <form class="login-form" onsubmit="login(); return false;">
       <input type="text" placeholder="username" id="user2"/>
       <input type="password" placeholder="password" id="password2"/>
+      <p class="left hidden link_msg"></p>
       <button>login</button>
       <p class="message switcher">Not registered? <a href="#signup">Create an account</a></p>
       <p class="message"><a href="https://tellbudgetbot.com/forgot.html">Forgot your password?</a></p>

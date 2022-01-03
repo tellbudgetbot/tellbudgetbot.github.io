@@ -2,10 +2,23 @@ $('.switcher a').click(function(){
    $('form').animate({height: "toggle", opacity: "toggle"}, 50);
 });
 function preinit() {
+  var url = window.location.href;
+  var client_id = getParameterByName("client_id", url);
   if(document.location.hash.indexOf("signup")!==-1 ||
-     window.location.search.indexOf("alexa")!==-1 ||
-     window.location.search.indexOf("bixby")!==-1) {
+     client_id == "alexa" ||
+     client_id == "bixby") {
     $('form').animate({height: "toggle", opacity: "toggle"}, 50);
+  }
+  if(client_id) {
+    var link_types = {
+      "alexa": "Alexa",
+      "messenger": "Facebook Messenger",
+      "bixby": "Bixby",
+      "messenger_alt": "Facebook Messenger"
+    };
+    var link_type = link_types[client_id] || "an external service";
+    $('.link_msg').text("By continuing, you will link your Budget Bot account to " + link_type + ".");
+    $('.link_msg').removeClass("hidden");
   }
 }
 function showVideo() {
@@ -88,43 +101,59 @@ function redir(user,data){
   localStorage.setItem("user",user);
   localStorage.setItem("userid",data.userid);
   localStorage.setItem("token",data.token);
-  if(window.location.search.indexOf("alexa")!==-1){
-    var url = window.location.href;
+  var url = window.location.href;
+  var client_id = getParameterByName("client_id", url);
+  if (client_id === "alexa"){
     var state = getParameterByName("state", url);
-    var client_id = getParameterByName("client_id", url);
     var response_type = getParameterByName("response_type", url);
     var scope = getParameterByName("scope", url);
     var redirect_uri = getParameterByName("redirect_uri", url);
-    if(client_id == "alexa" && is_valid_redirect(redirect_uri, client_id)) {
+    if(is_valid_redirect(redirect_uri, client_id)) {
       var uri = redirect_uri+"#state="+state+"&access_token="+data.token+"&token_type=Bearer";
       localStorage.setItem("redirect_uri", uri);
-      function do_redirect() {
+      function do_redirect_alexa() {
         document.location.href = "connect.html";
       }
-      $.post(host+"/alexa_event", {"token":data.token,"event":"alexa_link"}, do_redirect)
-       .fail(do_redirect);
+      $.post(host+"/alexa_event", {"token":data.token,"event":"alexa_link"}, do_redirect_alexa)
+       .fail(do_redirect_alexa);
       return;
     }
-  } else if(window.location.search.indexOf("messenger")!==-1) {
-    var url = window.location.href;
+  } else if(client_id == "messenger") {
     var link_token = getParameterByName("account_linking_token", url);
-    var client_id = getParameterByName("client_id", url);
     var redirect_uri = getParameterByName("redirect_uri", url);
-    if(client_id == "messenger" && is_valid_redirect(redirect_uri, client_id)) {
+    if(is_valid_redirect(redirect_uri, client_id)) {
       document.location.href=redirect_uri + "&authorization_code="+data.token;
       return;
     }
-  } else if(window.location.search.indexOf("bixby")!==-1) {
-    var url = window.location.href;
+  } else if(client_id == "messenger_alt") {
+    var link_token = getParameterByName("account_linking_token", url);
+    var ts = getParameterByName("ts", url);
+    var recipient_id = getParameterByName("recipient_id", url);
+    var page_id = getParameterByName("page_id", url);
+    var msgr_host = "https://msgr.tellbudgetbot.com:444"
+    function do_redirect_fb(data) {
+      if(data.error === undefined) {
+        window.close();
+        document.write("Account linked successfully! Close this window to continue.");
+      } else {
+        alert(data.error)
+      }
+    }
+    var fb_link_data = {"account_linking_token":link_token, "ts": ts, "recipient_id": recipient_id, "page_id": page_id, "authorization_code": data.token};
+    var fb_link_json = JSON.stringify(fb_link_data);
+    $.post(msgr_host+"/manual_link", fb_link_data, do_redirect_fb,"json").fail(function() {
+      alert('Network error');
+    });
+    return;
+  } else if(client_id == "bixby") {
     var state = getParameterByName("state", url);
-    var client_id = getParameterByName("client_id", url);
     var redirect_uri = getParameterByName("redirect_uri", url);
-    if(client_id == "bixby" && is_valid_redirect(redirect_uri, client_id)) {
-      function do_redirect() {
+    if(is_valid_redirect(redirect_uri, client_id)) {
+      function do_redirect_bixby() {
         document.location.href=redirect_uri + "?grant_type=authorization_code&code="+data.token+"&state="+state;
       }
-      $.post(host+"/bixby_event", {"token":data.token,"event":"bixby_link"}, do_redirect)
-       .fail(do_redirect);
+      $.post(host+"/bixby_event", {"token":data.token,"event":"bixby_link"}, do_redirect_bixby)
+       .fail(do_redirect_bixby);
       return;
     }
   }
