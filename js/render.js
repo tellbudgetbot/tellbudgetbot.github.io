@@ -527,6 +527,10 @@ function render_balance_response(raw_data) {
   render_account_sel(accountsel, data, []);
   accountsel = document.getElementById("account-dest");
   render_account_sel(accountsel, data, []);
+  accountsel = document.getElementById("bulk-account-sel");
+  if(accountsel) {
+    render_account_sel(accountsel, data, []);
+  }
 
   accountsel = document.getElementById("expenses-account-sel");
   var eaccountsel = render_account_sel(accountsel, data, EXTRA_ACCOUNT_OPTIONS);

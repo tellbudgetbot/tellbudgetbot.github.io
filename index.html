@@ -82,6 +82,7 @@
                 <li class="pure-menu-item"><a href="#plan" class="pure-menu-link">Plan</a></li>
                 <li class="pure-menu-item"><a href="#view" class="pure-menu-link">Transactions</a></li>
                 <li class="pure-menu-item"><a href="#addtransfer" class="pure-menu-link">Add Transfer</a></li>
+                <li class="pure-menu-item"><a href="#bulkupload" class="pure-menu-link">Bulk Upload</a></li>
                 <li class="pure-menu-item"><a href="#account" class="pure-menu-link">Account</a></li>
                 <li class="pure-menu-item"><a href="help.html" class="pure-menu-link">Help</a></li>
             </ul>
@@ -190,6 +191,30 @@
 						<div id="add-transfer-status"></div>
             </div>
 				</div>
+				<div class="content">
+            <h2 class="content-subhead"><a class='anchor' name='bulkupload'>Bulk Upload
+            <sup><span data-tooltip="Upload a CSV of transactions exported from your credit card or bank. Descriptions get a * prefix, and transactions already on the account (same amount, within 3 days) are skipped.">
+            <i class="fas fa-question-circle fa-sm"></i></span></sup>
+            </a></h2>
+						<div id="bulk-upload">
+            <form class="pure-form-stacked" onsubmit="bulk_preview(); return false;">
+                <fieldset>
+                <label for="bulk-account-sel">Account:</label><select id="bulk-account-sel"></select>
+                <label for="bulk-file">CSV file:</label><input id="bulk-file" type="file" accept=".csv,.txt,text/csv"/>
+                <label for="bulk-sign">Amount sign:</label>
+                <select id="bulk-sign">
+                  <option value="auto">Detect automatically</option>
+                  <option value="positive">Purchases are positive in the file</option>
+                  <option value="negative">Purchases are negative in the file</option>
+                </select>
+                <button class="pure-button">Preview</button>
+                </fieldset>
+            </form>
+						<div id="bulk-status"></div>
+						<div id="bulk-preview"></div>
+            <button id="bulk-upload-btn" class="pure-button pure-button-primary" style="display:none" onclick="bulk_upload();">Upload</button>
+            </div>
+				</div>
         <div class="content">
             <h2 class="content-subhead"><a class='anchor' name='account'>Account</a></h2>
           <p class="tall"><a href="#" id="logoutBtn" class="pure-button no-link">Log out</a>
@@ -208,7 +233,8 @@
 
 <script src="js/util.js?nocache=1"></script>
 <script src="js/ui.js"></script>
-<script src="js/render.js?nocache=3"></script>
+<script src="js/render.js?nocache=4"></script>
+<script src="js/bulk.js?nocache=1"></script>
 
 </body>
 </html>
