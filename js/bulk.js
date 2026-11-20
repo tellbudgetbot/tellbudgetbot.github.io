@@ -257,8 +257,8 @@ function bulk_guess_columns(rows) {
 // Checked against the transaction description before the CSV's own category.
 var BULK_DESCRIPTION_RULES = [
   [/walgreens/, "Health"],
-  [/\bbp\b|\bshell\b|chevron|exxon|\bmobil\b|speedway|marathon petro|citgo|sunoco|valero|texaco|\barco\b|phillips 66|conoco|wawa|sheetz|casey'?s|circle k|\bgas\b|gasoline|fuel/, "Transportation"],
-  [/jewel|trader joe|whole foods|kroger|safeway|aldi\b|publix|albertsons|wegmans|\bheb\b|meijer|food lion|giant eagle|stop & shop|stop and shop|sprouts|mariano|grocer|supermarket|piggly|ralphs|vons|harris teeter|shoprite|winco|save-a-lot|fresh market/, "Groceries"],
+  [/\bbp\b|\bshell\b|chevron|exxon|\bmobil\b|speedway|marathon petro|citgo|sunoco|valero|texaco|\barco\b|phillips 66|conoco|wawa|sheetz|casey'?s|circle k|\bgas\b|gasoline|fuel|\buber\b(?! ?eats)|lyft|\bcurb\b/, "Transportation"],
+  [/jewel|costco|trader joe|whole foods|kroger|safeway|aldi\b|publix|albertsons|wegmans|\bheb\b|meijer|food lion|giant eagle|stop & shop|stop and shop|sprouts|mariano|grocer|supermarket|piggly|ralphs|vons|harris teeter|shoprite|winco|save-a-lot|fresh market/, "Groceries"],
   [/fitness/, "Fitness"],
   [/\bgarage\b|parking|\bunited\b(?! ?(health|way|states|bank))|southwest|airline|airways|\bair lines\b|jetblue|allegiant|\bdelta air|alaska air/, "Transportation"],
   [/disney|\bapple\b|peacock|netflix|hulu|\bhbo\b|spotify|youtube|paramount|prime video|crunchyroll|audible|twitch|\bsling\b|pandora|\bmax\.com/, "Entertainment"]
