@@ -229,3 +229,20 @@ a.no-link.pure-button {
 	width: 100%;
 	height: 100%;
 }
+
+#bulk-status {
+  white-space: pre-line;
+  color: #555;
+  margin: 0.5em 0;
+}
+.bulk-table-wrap {
+  max-height: 30em;
+  overflow: auto;
+  margin-bottom: 1em;
+}
+.bulk-table td.bulk-amt {
+  text-align: right;
+}
+.bulk-table tr.bulk-skip td {
+  color: #999;
+}
