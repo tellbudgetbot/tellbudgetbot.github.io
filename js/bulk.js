@@ -254,31 +254,49 @@ function bulk_guess_columns(rows) {
 
 // ---------- Category normalization ----------
 
+// Checked against the transaction description before the CSV's own category.
+var BULK_DESCRIPTION_RULES = [
+  [/walgreens/, "Health"],
+  [/\bbp\b|\bshell\b|chevron|exxon|\bmobil\b|speedway|marathon petro|citgo|sunoco|valero|texaco|\barco\b|phillips 66|conoco|wawa|sheetz|casey'?s|circle k|\bgas\b|gasoline|fuel|\buber\b(?! ?eats)|lyft|\bcurb\b/, "Transportation"],
+  [/jewel|costco|trader joe|whole foods|kroger|safeway|aldi\b|publix|albertsons|wegmans|\bheb\b|meijer|food lion|giant eagle|stop & shop|stop and shop|sprouts|mariano|grocer|supermarket|piggly|ralphs|vons|harris teeter|shoprite|winco|save-a-lot|fresh market/, "Groceries"],
+  [/fitness/, "Fitness"],
+  [/\bgarage\b|parking|\bunited\b(?! ?(health|way|states|bank))|southwest|airline|airways|\bair lines\b|jetblue|allegiant|\bdelta air|alaska air/, "Transportation"],
+  [/disney|\bapple\b|peacock|netflix|hulu|\bhbo\b|spotify|youtube|paramount|prime video|crunchyroll|audible|twitch|\bsling\b|pandora|\bmax\.com/, "Entertainment"]
+];
+
 var BULK_CATEGORY_RULES = [
-  [/payment|thank you|autopay/, null],
+  [/payment|thank you|autopay/, "Miscellaneous"],
   [/grocer|supermarket|food market/, "Groceries"],
   [/restaurant|dining|food|drink|coffee|cafe|café|bar\b|fast food|eating out|takeout|bakery/, "Dining"],
   [/gas|fuel|auto|\bcars?\b|car rental|parking|toll|transport|transit|taxi|rideshare|uber|lyft|airfare|airline|\btrain|\bbus\b/, "Transportation"],
   [/utilit|phone|cable|internet|wireless|mobile|electric|water|bill/, "Utilities"],
   [/\brent\b|mortgage|housing/, "Housing"],
-  [/health|medical|pharmac|drug|doctor|dental|vision|wellness|fitness|gym|hospital|personal care/, "Health"],
+  [/health|medical|pharmac|drug|doctor|dental|vision|wellness|gym|hospital|personal care/, "Health"],
   [/\bpets?\b|veterinar/, "Pets"],
   [/educat|tuition|school|book/, "Education"],
   [/cloth|apparel|shoe|fashion/, "Clothing"],
   [/electronic|computer|software/, "Electronics"],
   [/home|furniture|hardware|household|garden/, "Home supplies"],
   [/office/, "Office supplies"],
+  [/fitness/, "Fitness"],
   [/laundry|dry clean/, "Laundry"],
   [/entertain|movie|music|stream|recreation|hobb|sport|game|event|ticket/, "Entertainment"],
   [/income|paycheck|payroll|salary|deposit/, "Income"],
   [/shopping|merchandise|retail|department|general|other|misc|fee|interest|personal|service/, "Miscellaneous"]
 ];
 
-function bulk_normalize_category(raw, existing) {
-  if(!raw) {
-    return "";
+// Never returns an empty string: falls back to Miscellaneous.
+function bulk_normalize_category(raw, existing, description) {
+  var desc = (description || "").toLowerCase();
+  for(var d = 0; d < BULK_DESCRIPTION_RULES.length; d++) {
+    if(BULK_DESCRIPTION_RULES[d][0].test(desc)) {
+      return BULK_DESCRIPTION_RULES[d][1];
+    }
   }
-  var trimmed = raw.trim();
+  var trimmed = (raw || "").trim();
+  if(!trimmed) {
+    return "Miscellaneous";
+  }
   var lower = trimmed.toLowerCase();
   existing = existing || [];
   for(var i = 0; i < existing.length; i++) {
@@ -288,7 +306,7 @@ function bulk_normalize_category(raw, existing) {
   }
   for(var j = 0; j < BULK_CATEGORY_RULES.length; j++) {
     if(BULK_CATEGORY_RULES[j][0].test(lower)) {
-      return BULK_CATEGORY_RULES[j][1] || "";
+      return BULK_CATEGORY_RULES[j][1];
     }
   }
   return trimmed;
@@ -408,7 +426,7 @@ function bulk_extract(text, signMode, existingCats) {
     }
     tx.amount = Math.round(tx.amount * 100) / 100;
     tx.isPayment = tx.amount < 0 && bulk_is_payment(tx.description, tx.rawCategory, tx.type);
-    tx.category = bulk_normalize_category(tx.rawCategory, existingCats);
+    tx.category = bulk_normalize_category(tx.rawCategory, existingCats, tx.description);
   }
   return {txns: txns, errors: errors};
 }
@@ -533,6 +551,24 @@ function bulk_preview() {
   reader.readAsText(fileEl.files[0]);
 }
 
+function bulk_category_input(t) {
+  var input = document.createElement("input");
+  input.type = "text";
+  input.className = "bulk-cat-input category-sel";
+  input.value = t.category;
+  input.autocomplete = "off";
+  input.setAttribute("data-lpignore", "true");
+  input.addEventListener("input", function() {
+    t.category = input.value.trim();
+  });
+  input.addEventListener("blur", function() {
+    t.category = input.value.trim() || "Miscellaneous";
+    input.value = t.category;
+  });
+  $(input).autocomplete({"source": state.categories});
+  return input;
+}
+
 function bulk_render_preview(errors) {
   var rows = bulk_state.rows;
   var container = document.getElementById("bulk-preview");
@@ -575,7 +611,7 @@ function bulk_render_preview(errors) {
         bulk_update_upload_btn();
       };
     })(t, tr));
-    var cells = [cb, format_date(t.date), BULK_PREFIX + t.description, format_dollars(t.amount), t.category || "(auto)", status];
+    var cells = [cb, format_date(t.date), BULK_PREFIX + t.description, format_dollars(t.amount), bulk_category_input(t), status];
     for(var c = 0; c < cells.length; c++) {
       var td = document.createElement("td");
       if(typeof cells[c] === "string") {
@@ -651,9 +687,7 @@ function bulk_upload() {
     var data = auth();
     data["description"] = BULK_PREFIX + t.description;
     data["amount"] = t.amount;
-    if(t.category) {
-      data["category"] = t.category;
-    }
+    data["category"] = t.category || "Miscellaneous";
     data["account"] = acct;
     data["timestamp"] = t.date.getTime() / 1000;
     data["timezone"] = t.date.getTimezoneOffset();
