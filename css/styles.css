@@ -246,3 +246,7 @@ a.no-link.pure-button {
 .bulk-table tr.bulk-skip td {
   color: #999;
 }
+.bulk-cat-input {
+  width: 10em;
+  margin: 0;
+}

@@ -257,6 +257,8 @@ function bulk_guess_columns(rows) {
 // Checked against the transaction description before the CSV's own category.
 var BULK_DESCRIPTION_RULES = [
   [/walgreens/, "Health"],
+  [/\bbp\b|\bshell\b|chevron|exxon|\bmobil\b|speedway|marathon petro|citgo|sunoco|valero|texaco|\barco\b|phillips 66|conoco|wawa|sheetz|casey'?s|circle k|\bgas\b|gasoline|fuel/, "Transportation"],
+  [/jewel|trader joe|whole foods|kroger|safeway|aldi\b|publix|albertsons|wegmans|\bheb\b|meijer|food lion|giant eagle|stop & shop|stop and shop|sprouts|mariano|grocer|supermarket|piggly|ralphs|vons|harris teeter|shoprite|winco|save-a-lot|fresh market/, "Groceries"],
   [/fitness/, "Fitness"],
   [/\bgarage\b|parking|\bunited\b(?! ?(health|way|states|bank))|southwest|airline|airways|\bair lines\b|jetblue|allegiant|\bdelta air|alaska air/, "Transportation"],
   [/disney|\bapple\b|peacock|netflix|hulu|\bhbo\b|spotify|youtube|paramount|prime video|crunchyroll|audible|twitch|\bsling\b|pandora|\bmax\.com/, "Entertainment"]
@@ -549,6 +551,24 @@ function bulk_preview() {
   reader.readAsText(fileEl.files[0]);
 }
 
+function bulk_category_input(t) {
+  var input = document.createElement("input");
+  input.type = "text";
+  input.className = "bulk-cat-input category-sel";
+  input.value = t.category;
+  input.autocomplete = "off";
+  input.setAttribute("data-lpignore", "true");
+  input.addEventListener("input", function() {
+    t.category = input.value.trim();
+  });
+  input.addEventListener("blur", function() {
+    t.category = input.value.trim() || "Miscellaneous";
+    input.value = t.category;
+  });
+  $(input).autocomplete({"source": state.categories});
+  return input;
+}
+
 function bulk_render_preview(errors) {
   var rows = bulk_state.rows;
   var container = document.getElementById("bulk-preview");
@@ -591,7 +611,7 @@ function bulk_render_preview(errors) {
         bulk_update_upload_btn();
       };
     })(t, tr));
-    var cells = [cb, format_date(t.date), BULK_PREFIX + t.description, format_dollars(t.amount), t.category, status];
+    var cells = [cb, format_date(t.date), BULK_PREFIX + t.description, format_dollars(t.amount), bulk_category_input(t), status];
     for(var c = 0; c < cells.length; c++) {
       var td = document.createElement("td");
       if(typeof cells[c] === "string") {
@@ -667,7 +687,7 @@ function bulk_upload() {
     var data = auth();
     data["description"] = BULK_PREFIX + t.description;
     data["amount"] = t.amount;
-    data["category"] = t.category;
+    data["category"] = t.category || "Miscellaneous";
     data["account"] = acct;
     data["timestamp"] = t.date.getTime() / 1000;
     data["timezone"] = t.date.getTimezoneOffset();
