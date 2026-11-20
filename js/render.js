@@ -18,8 +18,22 @@ var state = {
   "userinfo": null,
   "localmode": false,
   "deleted_keys": {},
-  "export_pending": false
+  "export_pending": false,
+  "editing": {}
 };
+
+// Rows currently being edited. Auto-refresh skips re-rendering while any
+// row is in edit mode so in-progress edits aren't wiped out.
+function set_editing(key, on) {
+  if(on) {
+    state.editing[key] = true;
+  } else {
+    delete state.editing[key];
+  }
+}
+function is_editing() {
+  return Object.keys(state.editing).length > 0;
+}
 function getCurrentMonth() {
   return MONTH_NAMES[new Date().getMonth()];
 }
@@ -81,8 +95,10 @@ function render_account(datai) {
     balance_td.replaceChild(balance_edit, balance_inner);
     acct_td.replaceChild(acct_edit, acct_inner);
     update_td.replaceChild(buttons_edit, buttons_inner);
+    set_editing("acct:" + key, true);
   });
   function showInner() {
+    set_editing("acct:" + key, false);
     balance_td.replaceChild(balance_inner, balance_edit);
     acct_td.replaceChild(acct_inner, acct_edit);
     update_td.replaceChild(buttons_inner, buttons_edit);
@@ -292,8 +308,10 @@ function render_goal(datai) {
     goal_edit.className = "goal-edit";
     goal_td.replaceChild(goal_edit, goal_inner);
     update_td.replaceChild(buttons_edit, buttons_inner);
+    set_editing("goal:" + category, true);
   });
   function showInner() {
+    set_editing("goal:" + category, false);
     goal_td.replaceChild(goal_inner, goal_edit);
     update_td.replaceChild(buttons_inner, buttons_edit);
   }
@@ -384,7 +402,7 @@ function delete_all_goals() {
 }
 
 function render_goal_response(raw_data) {
-  if(raw_data.cached) {
+  if(raw_data.cached || is_editing()) {
     return;
   }
   state.last_goal_change = raw_data.last_change;
@@ -480,7 +498,7 @@ function render_goals() {
 }
 
 function render_balance_response(raw_data) {
-  if(raw_data.cached) {
+  if(raw_data.cached || is_editing()) {
     return;
   }
   state.last_account_change = raw_data.last_change;
@@ -712,6 +730,7 @@ function render_expense(datai) {
     acct.replaceChild(acct_edit, acct_inner);
     cat.replaceChild(cat_edit, cat_inner);
     btns.replaceChild(btns_edit, btns_inner);
+    set_editing("expense:" + key, true);
   });
   del.addEventListener("click", function() {
     if(confirm("Are you sure you want to delete this budget item?")) {
@@ -738,6 +757,7 @@ function render_expense(datai) {
     }
   });
   function showInner() {
+    set_editing("expense:" + key, false);
     amt.replaceChild(amt_inner, amt_edit);
     desc.replaceChild(desc_inner, desc_edit);
     acct.replaceChild(acct_inner, acct_edit);
@@ -1015,7 +1035,7 @@ function applyFilters(unfiltered_data, acctFilter) {
 
 function render_expenses(callback) {
   function render_expenses_response(raw_data) {
-    if(raw_data.cached) {
+    if(raw_data.cached || is_editing()) {
       return;
     }
     state.last_expense_change = raw_data.last_change;
@@ -1181,6 +1201,7 @@ function submit_transfer() {
 }
 
 function expense_month_selector_changed() {
+  state.editing = {};
   state.last_expense_change = "(unknown)";
   document.getElementById("expenses").style.opacity=0.5;
   render_expenses(function() {
